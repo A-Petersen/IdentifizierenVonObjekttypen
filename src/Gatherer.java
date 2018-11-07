@@ -27,13 +27,15 @@ public class Gatherer {
         System.out.println(objectA + "\n"  + objectB);
         meanA = mean(objectA);
         meanB = mean(objectB);
+        System.out.println("MeanA: " + meanA + " | MeanB: " + meanB);
+
         objectAarr.forEach(x -> System.out.println(x[0] + " - " + x[1]));
         objectBarr.forEach(x -> System.out.println(x[0] + " - " + x[1]));
-        System.out.println("MeanA: " + meanA + " | MeanB: " + meanB);
+
     }
 
     public void createObjectLists() throws IOException {
-        int count = 1;
+        int count = 0;
         Reader data = new FileReader("Data/data.csv");
         Iterable<CSVRecord> rows = CSVFormat.EXCEL.parse(data);
         for (CSVRecord row : rows) {

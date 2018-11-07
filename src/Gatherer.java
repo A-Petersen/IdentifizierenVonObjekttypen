@@ -13,7 +13,9 @@ public class Gatherer {
     private Map<Integer, Integer> A = new LinkedHashMap<>();
     private Map<Integer, Integer> B = new LinkedHashMap<>();
     private List<Integer> objectA = new LinkedList<>();
+    private List<String[]> objectAarr = new LinkedList<>();
     private List<Integer> objectB = new LinkedList<>();
+    private List<String[]> objectBarr = new LinkedList<>();
     private double meanA;
     private double meanB;
 
@@ -22,9 +24,11 @@ public class Gatherer {
         B = createObjectCoord('B');
         System.out.println(A + "\n" + B);
         createObjectLists();
-        System.out.println(objectA + "\n" + objectB);
+        System.out.println(objectA + "\n"  + objectB);
         meanA = mean(objectA);
         meanB = mean(objectB);
+        objectAarr.forEach(x -> System.out.println(x[0] + " - " + x[1]));
+        objectBarr.forEach(x -> System.out.println(x[0] + " - " + x[1]));
         System.out.println("MeanA: " + meanA + " | MeanB: " + meanB);
     }
 
@@ -36,9 +40,12 @@ public class Gatherer {
             if (count == 3) System.out.println("TEST [2][0]: " + row.get(0));
             if (A.containsKey(count)) {
                 objectA.add(Integer.parseInt(row.get(A.get(count) - 1).replace(".", "")));
+                objectAarr.add(row.get(A.get(count) - 1).split("\\."));
+//                System.out.println((row.get(A.get(count) - 1).split("\\.")));
             }
             if (B.containsKey(count)) {
                 objectB.add(Integer.parseInt(row.get(B.get(count) - 1).replace(".", "")));
+                objectBarr.add(row.get(B.get(count) - 1).split("\\."));
             }
             count++;
         }

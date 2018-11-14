@@ -9,9 +9,12 @@ public class View {
     private int yStart;
     private Gatherer points = new Gatherer();
 
-//    View (int xSize, int xStart, int ySize, int yStart) throws IOException {
-//
-//    }
+    View (int xSize, int xStart, int ySize, int yStart) throws IOException {
+        this.xSize = xSize;
+        this.xStart = xStart;
+        this.ySize = ySize;
+        this.yStart = yStart;
+    }
 
     View (int index, int ab, char type) throws IOException {
         Coord3d coord = points.getCoords(type == 'A' ? 'A' : 'B', 1000, 1000, 0, 0).get(index);

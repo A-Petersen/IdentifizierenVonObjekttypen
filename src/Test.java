@@ -25,16 +25,14 @@ public class Test extends AbstractAnalysis {
     private int xStart;
     private int ySize;
     private int yStart;
+    private boolean grid;
 
-    Test (View view) {
-//        xSize = 1840;
-//        xStart = 1820;
-//        ySize = 1130;
-//        yStart = 1090;
+    Test (View view, boolean grid) {
         xSize = view.getxSize();
         xStart = view.getxStart();
         ySize = view.getySize();
         yStart = view.getyStart();
+        this.grid = grid;
     }
     @Override
     public void init() throws IOException {
@@ -61,7 +59,7 @@ public class Test extends AbstractAnalysis {
         // Creates the 3d object
         final Shape surface = new Shape(polygons);
         surface.setColorMapper(new ColorMapper(new ColorMapRainbow(), surface.getBounds().getZmin(), surface.getBounds().getZmax(), new org.jzy3d.colors.Color(1,1,1,1f)));
-        surface.setWireframeDisplayed(true);
+        surface.setWireframeDisplayed(grid);
         surface.setWireframeColor(Color.GREEN);
 
         chart = AWTChartComponentFactory.chart(Quality.Advanced, getCanvasType());

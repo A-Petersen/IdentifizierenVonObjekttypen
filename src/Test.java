@@ -21,22 +21,27 @@ import java.util.List;
 
 public class Test extends AbstractAnalysis {
 
-    private static int xSize = 1880;
-    private static int xStart = 1820;
-    private static int ySize = 1200;
-    private static int yStart = 960;
+    private int xSize;
+    private int xStart;
+    private int ySize;
+    private int yStart;
 
-    public static void main(String[] args) throws Exception {
-        AnalysisLauncher.open(new Test());
+    Test (View view) {
+//        xSize = 1840;
+//        xStart = 1820;
+//        ySize = 1130;
+//        yStart = 1090;
+        xSize = view.getxSize();
+        xStart = view.getxStart();
+        ySize = view.getySize();
+        yStart = view.getyStart();
     }
-
     @Override
     public void init() throws IOException {
 
         Gatherer points = new Gatherer();
         List<Coord3d> coordsA = points.getCoords('A', xSize, ySize, xStart, yStart);
         List<Coord3d> coordsB = points.getCoords('B', xSize, ySize, xStart, yStart);
-
 
         List<List<Integer>> data = createObjectLists();
 
@@ -65,8 +70,6 @@ public class Test extends AbstractAnalysis {
         chart.getAxeLayout().setXAxeLabel( "x-test" );
         chart.getAxeLayout().setYAxeLabel( "y-test" );
         chart.getAxeLayout().setZAxeLabel( "z-test" );
-
-//        chart.addLight(new Coord3d(100.0,100.0,100.0));
 
         coordsA.forEach(x  -> chart.addDrawable(new Point(x, Color.RED, 20)));
         coordsB.forEach(x  -> chart.addDrawable(new Point(x, Color.GREEN, 20)));

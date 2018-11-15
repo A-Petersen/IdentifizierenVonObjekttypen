@@ -17,11 +17,11 @@ public class View {
     }
 
     View (int index, int ab, char type) throws IOException {
-        Coord3d coord = points.getCoords(type == 'A' ? 'A' : 'B', 1000, 1000, 0, 0).get(index);
-        xSize = secureOutOfBound((int)coord.x + ab,0, 1000);
-        xStart = secureOutOfBound((int)coord.x - ab,0, 1000);
-        ySize = secureOutOfBound((int)coord.y + ab,0, 1000);
-        yStart = secureOutOfBound((int)coord.y - ab,0, 1000);
+        Coord3d coord = points.getCoords(type == 'A' ? 'A' : 'B', 4000, 3000, 0, 0).get(index);
+        xSize = secureOutOfBound((int)coord.x + ab,0, 4000);
+        xStart = secureOutOfBound((int)coord.x - ab,0, 4000);
+        ySize = secureOutOfBound((int)coord.y + ab,0, 3000);
+        yStart = secureOutOfBound((int)coord.y - ab,0, 3000);
         System.out.println(xSize + "-" + xStart + "-" + yStart + "-" + ySize);
     }
 

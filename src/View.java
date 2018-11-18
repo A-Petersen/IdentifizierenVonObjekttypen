@@ -17,7 +17,7 @@ public class View {
     }
 
     View (int index, int ab, char type) throws IOException {
-        Coord3d coord = points.getCoords(type == 'A' ? 'A' : 'B', 4943, 3000, 0, 0).get(index);
+        Coord3d coord = points.getCoords(type == 'A' ? 'A' : 'B', 4943, 3000, 1, 1).get(index);
         xSize = secureOutOfBound((int)coord.x + ab,0, 4943);
         xStart = secureOutOfBound((int)coord.x - ab,0, 4943);
         ySize = secureOutOfBound((int)coord.y + ab,0, 3000);

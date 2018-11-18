@@ -36,7 +36,7 @@ public class Gatherer {
         coordsA = getCoords('A', numRows,3000,0,0);
         coordsB = getCoords('B', numRows,3000,0,0);
 
-        Object testObj = new Object(coordsB.get(1), 2);
+        Object testObj = new Object(coordsB.get(1), 1);
 //        System.out.println("MeanA: " + meanA + " | MeanB: " + meanB);
 
 //        objectAarr.forEach(x -> System.out.println(x[0] + " - " + x[1]));

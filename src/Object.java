@@ -25,10 +25,11 @@ public class Object {
         List<Double> dummy = new LinkedList<>();
         Point startPoint = new Point(halfSize, 0);
         for (int i = 0; i < halfSize *2; i++) {
+            System.out.println("P(" + startPoint.x + "|" + startPoint.y + ")");
             dummy.add(getGradient(matrixList, startPoint, 'y'));
             startPoint.moveOneY();
-            System.out.println(dummy);
         }
+        System.out.println(dummy);
     }
 
     private double getGradient(List<List<Integer>> mList, Point a, char direction) {
@@ -38,7 +39,7 @@ public class Object {
             return (mList.get(a.x + 1).get(a.y) - mList.get(a.x).get(a.y));
         }
         System.out.println("Z zZ.:" + matrixList.get(a.x).get(a.y));
-        System.out.println("(" + mList.get(a.x).get(a.y + 1) + ") - (" + mList.get(a.x).get(a.y) + ")");
+        System.out.println("(" + mList.get(a.x).get(a.y + 1) + ") - (" + mList.get(a.x).get(a.y) + ") = " + (mList.get(a.x).get(a.y + 1) - mList.get(a.x).get(a.y)));
         return (mList.get(a.x).get(a.y + 1) - mList.get(a.x).get(a.y));
     }
 

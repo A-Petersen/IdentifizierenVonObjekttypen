@@ -1,7 +1,6 @@
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.jzy3d.analysis.AbstractAnalysis;
-import org.jzy3d.analysis.AnalysisLauncher;
 import org.jzy3d.chart.factories.AWTChartComponentFactory;
 import org.jzy3d.colors.Color;
 import org.jzy3d.colors.ColorMapper;
@@ -41,7 +40,7 @@ public class Test extends AbstractAnalysis {
         List<Coord3d> coordsA = points.getCoords('A', xSize, ySize, xStart, yStart);
         List<Coord3d> coordsB = points.getCoords('B', xSize, ySize, xStart, yStart);
 
-        List<List<Integer>> data = createObjectLists();
+        List<List<Integer>> data = Gatherer.getMatrix(xStart, xSize, yStart, ySize);
 
         // Build a polygon list
         List<Polygon> polygons = new ArrayList<>();
@@ -69,8 +68,8 @@ public class Test extends AbstractAnalysis {
         chart.getAxeLayout().setYAxeLabel( "y-test" );
         chart.getAxeLayout().setZAxeLabel( "z-test" );
 
-        coordsA.forEach(x  -> chart.addDrawable(new Point(x, Color.RED, 20)));
-        coordsB.forEach(x  -> chart.addDrawable(new Point(x, Color.GREEN, 20)));
+        coordsA.forEach(x  -> chart.addDrawable(new Point(new Coord3d(x.x, x.y, x.z + 10000), Color.RED, 20)));
+        coordsB.forEach(x  -> chart.addDrawable(new Point(new Coord3d(x.x, x.y, x.z + 10000), Color.GREEN, 20)));
 //        Point abc = new Point(new Coord3d(100.0,100.0,100.0), Color.RED, 5);
 //        chart.addDrawable(abc);
 
@@ -97,23 +96,22 @@ public class Test extends AbstractAnalysis {
 //        chart.getScene().getGraph().add(surface);
     }
 
-    public List<List<Integer>> createObjectLists() throws IOException {
-        int count = 0;
-        List<List<Integer>> dataList = new LinkedList<>();
-
-        Reader data = new FileReader("Data/data.csv");
-        Iterable<CSVRecord> rows = CSVFormat.EXCEL.parse(data);
-        for (CSVRecord row : rows) {
-            List<Integer> dataListInner = new LinkedList<>();
-//            for (int i = 0; i < row.size(); i++) {
-            for (int i = yStart; i < ySize; i++) {
-                if (count >= xStart) dataListInner.add(Integer.parseInt(row.get(i).replace(".", "")));
-            }
-            if (count >= xStart) dataList.add(dataListInner);
-            if (count == xSize - 1) break;
-            count++;
-        }
-        System.out.println(dataList.size() + " | " + dataList.get(0).size());
-        return dataList;
-    }
+//    public List<List<Integer>> getMatrix() throws IOException {
+//        int count = 0;
+//        List<List<Integer>> dataList = new LinkedList<>();
+//
+//        Reader data = new FileReader("Data/data.csv");
+//        Iterable<CSVRecord> rows = CSVFormat.EXCEL.parse(data);
+//        for (CSVRecord row : rows) {
+//            List<Integer> dataListInner = new LinkedList<>();
+//            for (int i = yStart; i < ySize; i++) {
+//                if (count >= xStart) dataListInner.add(Integer.parseInt(row.get(i).replace(".", "")));
+//            }
+//            if (count >= xStart) dataList.add(dataListInner);
+//            if (count == xSize - 1) break;
+//            count++;
+//        }
+//        System.out.println(dataList.size() + " | " + dataList.get(0).size());
+//        return dataList;
+//    }
 }

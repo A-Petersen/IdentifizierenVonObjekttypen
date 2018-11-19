@@ -68,8 +68,9 @@ public class Test extends AbstractAnalysis {
         chart.getAxeLayout().setYAxeLabel( "y-test" );
         chart.getAxeLayout().setZAxeLabel( "z-test" );
 
-        coordsA.forEach(x  -> chart.addDrawable(new Point(new Coord3d(x.x, x.y, x.z), Color.RED, 20)));
-        coordsB.forEach(x  -> chart.addDrawable(new Point(new Coord3d(x.x, x.y, x.z), Color.GREEN, 20)));
+        coordsA.forEach(x  -> chart.addDrawable(new Point(new Coord3d(x.x-1, x.y-1, x.z), Color.RED, 20)));
+        coordsB.forEach(x  -> chart.addDrawable(new Point(new Coord3d(x.x-1, x.y-1, x.z), Color.GREEN, 20)));
+//        coordsB.forEach(x-> System.out.println(x));
 //        Point abc = new Point(new Coord3d(100.0,100.0,100.0), Color.RED, 5);
 //        chart.addDrawable(abc);
 

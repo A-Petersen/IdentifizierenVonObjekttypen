@@ -28,19 +28,17 @@ public class Gatherer {
     private int numRows = 0;
 
     Gatherer() throws IOException {
-        xyValueA = getXYValues('A');
+//        xyValueA = getXYValues('A');
         xyValueB = getXYValues('B');
         getZValues();
-        meanA = mean(zValueA);
+//        meanA = mean(zValueA);
         meanB = mean(zValueB);
-        coordsA = getCoords('A', numRows,3000,0,0);
-        coordsB = getCoords('B', numRows,3000,0,0);
+//        coordsA = getCoords('A', numRows,3000,0,0);
+        coordsB = getCoords('B', numRows,3,1,1);
 
-        Object testObj = new Object(coordsB.get(1), 1);
+        Object testObj = new Object(coordsB.get(0), 2);
 //        System.out.println("MeanA: " + meanA + " | MeanB: " + meanB);
 
-//        objectAarr.forEach(x -> System.out.println(x[0] + " - " + x[1]));
-//        objectBarr.forEach(x -> System.out.println(x[0] + " - " + x[1]));
     }
 
     private void getZValues() throws IOException {
@@ -50,10 +48,10 @@ public class Gatherer {
 
         for (CSVRecord row : rows) {
             if (xyValueA.containsKey(count)) {
-                zValueA.add(Integer.parseInt(row.get(xyValueA.get(count) - 1).replace(".", "")));
+                zValueA.add(Integer.parseInt(row.get(xyValueA.get(count) -1).replace(".", "")));
             }
             if (xyValueB.containsKey(count)) {
-                zValueB.add(Integer.parseInt(row.get(xyValueB.get(count) - 1).replace(".", "")));
+                zValueB.add(Integer.parseInt(row.get(xyValueB.get(count) -1).replace(".", "")));
             }
             count++;
             numRows++;

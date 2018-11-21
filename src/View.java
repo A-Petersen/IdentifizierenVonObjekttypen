@@ -17,11 +17,11 @@ public class View {
     }
 
     View (int index, int ab, char type) throws IOException {
-        Coord3d coord = points.getCoords(type == 'A' ? 'A' : 'B', 4943, 3000, 1, 1).get(index);
-        xSize = secureOutOfBound((int)coord.x + ab,0, 4943);
-        xStart = secureOutOfBound((int)coord.x - ab,0, 4943);
-        ySize = secureOutOfBound((int)coord.y + ab,0, 3000);
-        yStart = secureOutOfBound((int)coord.y - ab,0, 3000);
+        Coord3d coord = points.getCoords(type == 'A' ? 'A' : 'B', 4943, 3000, 1, 1, false).get(index);
+        xSize = Gatherer.secureOutOfBound((int)coord.x + ab,0, 4943);
+        xStart = Gatherer.secureOutOfBound((int)coord.x - ab,0, 4943);
+        ySize = Gatherer.secureOutOfBound((int)coord.y + ab,0, 3000);
+        yStart = Gatherer.secureOutOfBound((int)coord.y - ab,0, 3000);
         System.out.println(xSize + "-" + xStart + "-" + yStart + "-" + ySize);
     }
 
@@ -41,9 +41,9 @@ public class View {
         return yStart;
     }
 
-    private int secureOutOfBound(int x, int min, int max) {
-        int res = x < min ? min : x;
-        res = res > max ? max : res;
-        return res;
-    }
+//    private int secureOutOfBound(int x, int min, int max) {
+//        int res = x < min ? min : x;
+//        res = res > max ? max : res;
+//        return res;
+//    }
 }

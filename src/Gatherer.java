@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Gatherer {
     public static void main(String[] args) throws Exception {
@@ -27,16 +28,34 @@ public class Gatherer {
     private double meanB;
     private int numRows = 0;
 
+    public List<Coord3d> getCoordsA() {
+        return coordsA;
+    }
+
+    public List<Coord3d> getCoordsB() {
+        return coordsB;
+    }
+
+    private static int objectMatrixSize = 8;
+    private static int numRows_static = 4943;
+    private static int numColumns_static = 3000;
+
     Gatherer() throws IOException {
-//        xyValueA = getXYValues('A');
+        xyValueA = getXYValues('A');
         xyValueB = getXYValues('B');
         getZValues();
 //        meanA = mean(zValueA);
-        meanB = mean(zValueB);
-//        coordsA = getCoords('A', numRows,3000,0,0);
-        coordsB = getCoords('B', numRows,3,1,1);
+//        meanB = mean(zValueB);
+        coordsA = getCoords('A', 1000,1000,1,1, true);
+        coordsB = getCoords('B', 1000,1000,1,1, true);
+        System.out.println("\nMax A: " + objectsA.stream().max(Comparator.comparing(Object::getMax)).get().getMax());
+        System.out.println("Min A: " + objectsA.stream().max(Comparator.comparing(Object::getMin)).get().getMin());
+        System.out.println("Avg A: " + objectsA.stream().mapToDouble(Object::getMax).average().getAsDouble());
+        System.out.println("Max B: " + objectsB.stream().max(Comparator.comparing(Object::getMax)).get().getMax());
+        System.out.println("Min B: " + objectsB.stream().max(Comparator.comparing(Object::getMin)).get().getMin());
+        System.out.println("Avg B: " + objectsB.stream().mapToDouble(Object::getMax).average().getAsDouble());
 
-        Object testObj = new Object(coordsB.get(0), 2);
+//        Object testObj = new Object(coordsB.get(0), 2);
 //        System.out.println("MeanA: " + meanA + " | MeanB: " + meanB);
 
     }
@@ -88,7 +107,7 @@ public class Gatherer {
         return res / list.size();
     }
 
-    public List<Coord3d> getCoords(char type, int xSize, int ySize, int xStart, int yStart) {
+    public List<Coord3d> getCoords(char type, int xSize, int ySize, int xStart, int yStart, boolean createObjects) throws IOException {
         List<Coord3d> list = new LinkedList<>();
         List<Integer> object = new LinkedList<>();
         Map<Integer, Integer> map = new LinkedHashMap<>();
@@ -107,8 +126,14 @@ public class Gatherer {
                 entry.getValue() > yStart &&
                 entry.getValue() <= ySize)
             {
-                list.add(new Coord3d(entry.getKey() - xStart, entry.getValue() - yStart, object.get(count)));
-                System.out.println(type + ": " + entry.getKey() + "-" + entry.getValue() + "-" + object.get(count));
+                Coord3d coord = new Coord3d(entry.getKey() - xStart, entry.getValue() - yStart, object.get(count));
+                list.add(coord);
+                System.out.println("\n" + type + ": " + entry.getKey() + "-" + entry.getValue() + "-" + object.get(count) + " Index[" + (list.size() - 1) + "]");
+                if (type == 'A' && createObjects) {
+                    objectsA.add(new Object(coord, objectMatrixSize, 'A'));
+                } else if (createObjects) {
+                    objectsB.add(new Object(coord, objectMatrixSize, 'B'));
+                }
             }
             count++;
         }
@@ -119,6 +144,11 @@ public class Gatherer {
     public static List<List<Integer>> getMatrix(int xStart, int xSize, int yStart, int ySize) throws IOException {
         int count = 0;
         List<List<Integer>> dataList = new LinkedList<>();
+
+        xSize = secureOutOfBound(xSize,0, 4943);
+        xStart = secureOutOfBound(xStart,0, 4943);
+        ySize = secureOutOfBound(ySize,0, 3000);
+        yStart = secureOutOfBound(yStart,0, 3000);
 
         Reader data = new FileReader("Data/data.csv");
         Iterable<CSVRecord> rows = CSVFormat.EXCEL.parse(data);
@@ -135,11 +165,9 @@ public class Gatherer {
         return dataList;
     }
 
-    public List<Coord3d> getCoordsA() {
-        return coordsA;
-    }
-
-    public List<Coord3d> getCoordsB() {
-        return coordsB;
+    public static int secureOutOfBound(int x, int min, int max) {
+        int res = x < min ? min : x;
+        res = res > max ? max : res;
+        return res;
     }
 }

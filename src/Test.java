@@ -37,8 +37,8 @@ public class Test extends AbstractAnalysis {
     public void init() throws IOException {
 
         Gatherer points = new Gatherer();
-        List<Coord3d> coordsA = points.getCoords('A', xSize, ySize, xStart, yStart);
-        List<Coord3d> coordsB = points.getCoords('B', xSize, ySize, xStart, yStart);
+        List<Coord3d> coordsA = points.getCoords('A', xSize, ySize, xStart, yStart, false);
+        List<Coord3d> coordsB = points.getCoords('B', xSize, ySize, xStart, yStart, false);
 
         List<List<Integer>> data = Gatherer.getMatrix(xStart, xSize, yStart, ySize);
 

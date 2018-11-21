@@ -4,45 +4,60 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Object {
+    private char type;
     private Coord3d position;
-    private int halfSize;
+    private int size;
     List<List<Integer>> matrixList = new LinkedList<>();
     List<Double> gradientsInX = new LinkedList<>();
     List<Double> gradientsInY = new LinkedList<>();
+    private double[] minMax;
 //    private Map<Integer, Double> gradients = new HashMap<>();
 
-    public Object(Coord3d position, int ab) throws IOException {
+    public double getMin() {
+        return minMax[1];
+    }
+
+    public double getMax() {
+        return minMax[0];
+    }
+
+    public Object(Coord3d position, int ab, char type) throws IOException {
+        this.type = type;
         this.position = position;
-        this.halfSize = ab;
+        this.size = ab;
         gatherGradients();
-        System.out.println("Max: " + maxGradientChange()[0] + " - Min: " + maxGradientChange()[1] );
+        minMax = maxGradientChange();
+        System.out.println("Max: " + minMax[0] + " \t Min: " + minMax[1] );
     }
 
     public void gatherGradients() throws IOException {
 
         System.out.println(position);
-        matrixList = Gatherer.getMatrix((int)position.x - halfSize, (int)position.x + halfSize, (int)position.y - halfSize, (int)position.y + halfSize);
-        System.out.println("Martix[0][0] = " + matrixList.get(0).get(0));
+        matrixList = Gatherer.getMatrix((int)position.x - size, (int)position.x + size, (int)position.y - size, (int)position.y + size);
+//        System.out.println("Martix[0][0] = " + matrixList.get(0).get(0));
 
 //        List<Double> gradientsInX = new LinkedList<>();
-        Point startPointX = new Point(halfSize, 0);
+        Point startPointX = new Point(size, 0);
 //        System.out.println("P(" + startPointX.x + "|" + startPointX.y + ")");
-        for (int i = 0; i < halfSize *2; i++) {
+        for (int i = 0; i < size *2; i++) {
             gradientsInX.add(getGradient(matrixList, startPointX, 'y'));
             startPointX.moveOneY();
         }
-        System.out.println(gradientsInX);
+        gradientsInX = gradientsInX.stream().map(x -> x < 0 ? x * -1 : x).collect(Collectors.toList());
+        System.out.println("Gradienten in X: " + gradientsInX);
 
 //        List<Double> gradientsInY = new LinkedList<>();
-        Point startPointY = new Point(0, halfSize);
+        Point startPointY = new Point(0, size);
 //        System.out.println("P(" + startPointY.x + "|" + startPointY.y + ")");
-        for (int i = 0; i < halfSize *2; i++) {
+        for (int i = 0; i < size *2; i++) {
             gradientsInY.add(getGradient(matrixList, startPointY, 'x'));
             startPointY.moveOneX();
         }
-        System.out.println(gradientsInY);
+        gradientsInY = gradientsInY.stream().map(x -> x < 0 ? x * -1 : x).collect(Collectors.toList());
+        System.out.println("Gradienten in Y: " + gradientsInY);
     }
 
     private double getGradient(List<List<Integer>> mList, Point a, char direction) {
@@ -70,17 +85,10 @@ public class Object {
             // <- y
             values.add(1 - (gradientsInY.get(j) / gradientsInY.get(j-1)));
         }
-        System.out.println(values);
+        values = values.stream().map(x -> x < 0 ? x * -1 : x).collect(Collectors.toList());
+        System.out.println("Gradienten XY in %: " + values);
         minMax[0] = values.stream().max(Comparator.comparing(Double::valueOf)).get();
         minMax[1] = values.stream().min(Comparator.comparing(Double::valueOf)).get();
         return minMax;
-    }
-
-    public int getHalfSize() {
-        return halfSize;
-    }
-
-    public void setHalfSize(int halfSize) {
-        this.halfSize = halfSize;
     }
 }

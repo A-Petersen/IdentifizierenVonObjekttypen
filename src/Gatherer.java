@@ -38,8 +38,8 @@ public class Gatherer {
     }
 
     private static int objectMatrixSize = 5;
-    public static int numRows_static = 2000; // 4943
-    public static int numColumns_static = 2000; // 3000
+    public static int numRows_static = 1000; // 4943
+    public static int numColumns_static = 1000; // 3000
 
     Gatherer(boolean xyz) throws IOException {
         xyValueA = getXYValues('A');
@@ -54,18 +54,22 @@ public class Gatherer {
         System.out.println("Min A: " + objectsA.stream().max(Comparator.comparing(Object::getMin)).get().getMin());
         System.out.println("Avg A: " + objectsA.stream().mapToDouble(Object::getMax).average().getAsDouble());
 //        System.out.println("Filter A - max < 10:\t" + objectsA.stream().filter(x -> x.getMax() < 10.0).count() + " out of " + objectsA.size());
-        System.out.println("Filter A - monotonic and max < 10:\t" + objectsA.stream()
+        System.out.println("Filter A - Flat:\t" + objectsA.stream().filter(x -> x.isFlat()).count() + " out of " + objectsA.size());
+        System.out.println("Filter A - monotonic && max < 10 && not Flat:\t" + objectsA.stream()
                 .filter(x -> x.issMonotonic())
                 .filter(x -> x.getMax() < 5.0)
+                .filter(x -> !x.isFlat())
                 .count() + " out of " + objectsA.size());
 
         System.out.println("Max B: " + objectsB.stream().max(Comparator.comparing(Object::getMax)).get().getMax());
         System.out.println("Min B: " + objectsB.stream().max(Comparator.comparing(Object::getMin)).get().getMin());
         System.out.println("Avg B: " + objectsB.stream().mapToDouble(Object::getMax).average().getAsDouble());
 //        System.out.println("Filter B - max < 10:\t" + objectsB.stream().filter(x -> x.getMax() < 10.0).count() + " out of " + objectsB.size());
-        System.out.println("Filter B - monotonic and max < 10:\t" + objectsB.stream()
+        System.out.println("Filter B - Flat:\t" + objectsB.stream().filter(x -> x.isFlat()).count() + " out of " + objectsB.size());
+        System.out.println("Filter B - monotonic && max < 10 && not Flat:\t" + objectsB.stream()
                 .filter(x -> x.issMonotonic())
                 .filter(x -> x.getMax() < 5.0)
+                .filter(x -> !x.isFlat())
                 .count() + " out of " + objectsB.size());
     }
 

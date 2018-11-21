@@ -16,6 +16,7 @@ public class Object {
     private double[] minMax;
     private boolean sMonotonic = true;
     private boolean symetric = true;
+    private boolean flat = false;
 
 //    private Map<Integer, Double> gradients = new HashMap<>();
 
@@ -32,8 +33,9 @@ public class Object {
         this.position = position;
         this.size = ab;
         gatherGradients();
+        flat();
         minMax = maxGradientChange();
-        System.out.println("Max: " + minMax[0] + " \t Min: " + minMax[1] );
+        System.out.println("Max: " + minMax[0] + " \t Min: " + minMax[1] + "\nFlat[" + flat + "]");
     }
 
     public void gatherGradients() throws IOException {
@@ -46,6 +48,7 @@ public class Object {
         position.z = maxZ.z;
         System.out.println("New Max Coord_pos: " + position);
         matrixList = Gatherer.getMatrix((int)position.x - size, (int)position.x + size, (int)position.y - size, (int)position.y + size);
+        normalize();
 //        System.out.println("Martix[0][0] = " + matrixList.get(0).get(0));
 
 //        List<Double> gradientsInX = new LinkedList<>();
@@ -135,6 +138,32 @@ public class Object {
 //
 //    }
 
+    private void flat() {
+        int whatsFlat = 200;
+        if (// x ->
+            ((gradientsInX.get(size +2) + gradientsInX.get(size +1) + gradientsInX.get(size) ) < whatsFlat)
+            ||// <- x
+            ((gradientsInX.get(size -3) + gradientsInX.get(size -2) + gradientsInX.get(size -1) ) < whatsFlat)
+
+            ||// y ->
+            ((gradientsInY.get(size +2) + gradientsInY.get(size +1) + gradientsInY.get(size) ) < whatsFlat)
+            ||// <- y
+            (( gradientsInY.get(size -3) + gradientsInY.get(size -2) + gradientsInY.get(size -1) ) < whatsFlat))
+//        if (// x ->
+//            ((gradientsInX.get(size +2) < gradientsInX.get(size+1)*1.5 ))
+//            ||// <- x
+//            ((gradientsInX.get(size -3) < gradientsInX.get(size -2)*1.5 ))
+//
+//            ||// y ->
+//            ((gradientsInY.get(size +2) < gradientsInY.get(size+1)*1.5 ))
+//            ||// <- y
+//            ((gradientsInY.get(size -3) < gradientsInY.get(size -2)*1.5 )))
+        {
+            flat = true;
+        }
+
+    }
+
     private Coord3d getMax(List<List<Integer>> matrixList) {
         int x = 0;
         int y = 0;
@@ -156,8 +185,52 @@ public class Object {
         return max;
     }
 
+    private Coord3d getMin(List<List<Integer>> matrixList) {
+        int x = 0;
+        int y = 0;
+        int z = 0;
+        Coord3d min = new Coord3d(Float.MAX_VALUE,Float.MAX_VALUE,Float.MAX_VALUE);
+        for (List<Integer> row : matrixList) {
+            for (Integer zValue : row) {
+                if (min.z > zValue) {
+                    min.z = zValue;
+                    min.x = x;
+                    min.y = y;
+                }
+                y++;
+            }
+            y = 0;
+            x++;
+        }
+//        System.out.println("New Max Coord: " + max);
+        return min;
+    }
 
     public boolean issMonotonic() {
         return sMonotonic;
+    }
+
+    public boolean isFlat() {
+        return flat;
+    }
+
+    private void normalize() {
+        // MIT INTEGER NICHT I.O.
+        int row = 0;
+        int column = 0;
+        int normValue = 10000;
+        int minZ = (int)getMin(matrixList).z;
+        double maxZ = getMax(matrixList).z - minZ;
+        for (List<Integer> list : matrixList) {
+            for (int z : list) {
+//                System.out.println("TEstXY "+ (z - minZ) + " / " + maxZ + " = " + (z - minZ)/maxZ);
+                list.set(column, (int)(((z - minZ)/maxZ) * normValue));
+                column++;
+            }
+            column = 0;
+            row++;
+        }
+//        matrixList.stream().forEach(x -> x.stream().forEach(y-> System.out.println(y)));
+        //Gradienten in X: (incl. negativ)[1204.0, 901.0, 602.0, 336.0, 127.0, -93.0, -563.0, -1099.0, -1738.0, -2179.0]
     }
 }

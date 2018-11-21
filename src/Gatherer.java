@@ -36,9 +36,9 @@ public class Gatherer {
         return coordsB;
     }
 
-    private static int objectMatrixSize = 8;
-    private static int numRows_static = 4943;
-    private static int numColumns_static = 3000;
+    private static int objectMatrixSize = 4;
+    public static int numRows_static = 1000; // 4943
+    public static int numColumns_static = 1000; // 3000
 
     Gatherer() throws IOException {
         xyValueA = getXYValues('A');
@@ -51,9 +51,11 @@ public class Gatherer {
         System.out.println("\nMax A: " + objectsA.stream().max(Comparator.comparing(Object::getMax)).get().getMax());
         System.out.println("Min A: " + objectsA.stream().max(Comparator.comparing(Object::getMin)).get().getMin());
         System.out.println("Avg A: " + objectsA.stream().mapToDouble(Object::getMax).average().getAsDouble());
+        System.out.println("Filter A - max < 10:\t" + objectsA.stream().filter(x -> x.getMax() < 10.0).count() + " out of " + objectsA.size());
         System.out.println("Max B: " + objectsB.stream().max(Comparator.comparing(Object::getMax)).get().getMax());
         System.out.println("Min B: " + objectsB.stream().max(Comparator.comparing(Object::getMin)).get().getMin());
         System.out.println("Avg B: " + objectsB.stream().mapToDouble(Object::getMax).average().getAsDouble());
+        System.out.println("Filter B - max < 10:\t" + objectsB.stream().filter(x -> x.getMax() < 10.0).count() + " out of " + objectsB.size());
 
 //        Object testObj = new Object(coordsB.get(0), 2);
 //        System.out.println("MeanA: " + meanA + " | MeanB: " + meanB);

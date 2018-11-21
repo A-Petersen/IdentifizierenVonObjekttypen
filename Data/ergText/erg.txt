@@ -1,0 +1,8 @@
+Max A: 200.66315789473686
+Min A: 0.7231121281464531
+Avg A: 6.970009175046508
+Filter A - monotonic and max < 10:	204 out of 281
+Max B: 1380.3333333333333
+Min B: 0.45454545454545453
+Avg B: 69.9335107532575
+Filter B - monotonic and max < 10:	36 out of 92

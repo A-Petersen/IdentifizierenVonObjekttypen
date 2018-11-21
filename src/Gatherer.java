@@ -37,9 +37,9 @@ public class Gatherer {
         return coordsB;
     }
 
-    private static int objectMatrixSize = 4;
-    public static int numRows_static = 1000; // 4943
-    public static int numColumns_static = 1000; // 3000
+    private static int objectMatrixSize = 5;
+    public static int numRows_static = 2000; // 4943
+    public static int numColumns_static = 2000; // 3000
 
     Gatherer(boolean xyz) throws IOException {
         xyValueA = getXYValues('A');
@@ -47,8 +47,8 @@ public class Gatherer {
         getZValues();
 //        meanA = mean(zValueA);
 //        meanB = mean(zValueB);
-        coordsA = getCoords('A', 1000,1000,1,1, true);
-        coordsB = getCoords('B', 1000,1000,1,1, true);
+        coordsA = getCoords('A', numRows_static,numColumns_static,1,1, true);
+        coordsB = getCoords('B', numRows_static,numColumns_static,1,1, true);
 
         System.out.println("\nMax A: " + objectsA.stream().max(Comparator.comparing(Object::getMax)).get().getMax());
         System.out.println("Min A: " + objectsA.stream().max(Comparator.comparing(Object::getMin)).get().getMin());

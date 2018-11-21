@@ -110,9 +110,12 @@ public class Object {
     }
 
     private void strictlyMonotonic(List<Double> values) {
-        // TODO: muss eigentlich i = 0 und  -2 zwei sein !!! schränkt im moment den kreis für monoton ein.
-        for (int i = 2; i < values.size() -4; i++) {
-            if (values.get(i) < values.get(i+1)) sMonotonic = false;
+        // TODO: muss eigentlich i = 0 und  -2 zwei sein !!! schränkt im moment den kreis für monoton ein. 1.25 streng monoton gilt auch für 25% nicht monoton
+        for (int i = 1; i < values.size() -3; i++) {
+            if ((i < size - 2) && values.get(i) * 1.5 < values.get(i+1))
+                sMonotonic = false;
+            if ((i >= size) && values.get(i) * 0.5 < values.get(i+1))
+                sMonotonic = false;
         }
     }
 

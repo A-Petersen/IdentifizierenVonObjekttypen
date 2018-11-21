@@ -36,7 +36,7 @@ public class Gatherer {
         return coordsB;
     }
 
-    private static int objectMatrixSize = 5;
+    private static int objectMatrixSize = 4;
     public static int numRows_static = 1000; // 4943
     public static int numColumns_static = 1000; // 3000
 

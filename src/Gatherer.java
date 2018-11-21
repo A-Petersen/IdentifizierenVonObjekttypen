@@ -11,7 +11,8 @@ import java.util.stream.Collectors;
 
 public class Gatherer {
     public static void main(String[] args) throws Exception {
-        Gatherer g = new Gatherer();
+        boolean xyz = true;
+        Gatherer g = new Gatherer(xyz);
     }
 
     // Koordinaten (Spalte,Zeile)
@@ -40,7 +41,7 @@ public class Gatherer {
     public static int numRows_static = 1000; // 4943
     public static int numColumns_static = 1000; // 3000
 
-    Gatherer() throws IOException {
+    Gatherer(boolean xyz) throws IOException {
         xyValueA = getXYValues('A');
         xyValueB = getXYValues('B');
         getZValues();
@@ -66,6 +67,34 @@ public class Gatherer {
                 .filter(x -> x.issMonotonic())
                 .filter(x -> x.getMax() < 5.0)
                 .count() + " out of " + objectsB.size());
+    }
+
+    Gatherer() throws IOException {
+        xyValueA = getXYValues('A');
+        xyValueB = getXYValues('B');
+        getZValues();
+//        meanA = mean(zValueA);
+//        meanB = mean(zValueB);
+//        coordsA = getCoords('A', 1000,1000,1,1, true);
+//        coordsB = getCoords('B', 1000,1000,1,1, true);
+//
+//        System.out.println("\nMax A: " + objectsA.stream().max(Comparator.comparing(Object::getMax)).get().getMax());
+//        System.out.println("Min A: " + objectsA.stream().max(Comparator.comparing(Object::getMin)).get().getMin());
+//        System.out.println("Avg A: " + objectsA.stream().mapToDouble(Object::getMax).average().getAsDouble());
+////        System.out.println("Filter A - max < 10:\t" + objectsA.stream().filter(x -> x.getMax() < 10.0).count() + " out of " + objectsA.size());
+//        System.out.println("Filter A - monotonic and max < 10:\t" + objectsA.stream()
+//                .filter(x -> x.issMonotonic())
+//                .filter(x -> x.getMax() < 5.0)
+//                .count() + " out of " + objectsA.size());
+//
+//        System.out.println("Max B: " + objectsB.stream().max(Comparator.comparing(Object::getMax)).get().getMax());
+//        System.out.println("Min B: " + objectsB.stream().max(Comparator.comparing(Object::getMin)).get().getMin());
+//        System.out.println("Avg B: " + objectsB.stream().mapToDouble(Object::getMax).average().getAsDouble());
+////        System.out.println("Filter B - max < 10:\t" + objectsB.stream().filter(x -> x.getMax() < 10.0).count() + " out of " + objectsB.size());
+//        System.out.println("Filter B - monotonic and max < 10:\t" + objectsB.stream()
+//                .filter(x -> x.issMonotonic())
+//                .filter(x -> x.getMax() < 5.0)
+//                .count() + " out of " + objectsB.size());
 
 //        Object testObj = new Object(coordsB.get(0), 2);
 //        System.out.println("MeanA: " + meanA + " | MeanB: " + meanB);

@@ -6,3 +6,13 @@ Max B: 1380.3333333333333
 Min B: 0.45454545454545453
 Avg B: 69.9335107532575
 Filter B - monotonic and max < 10:	36 out of 92
+
+
+
+
+-Symetrie hinzufügen
+-argumente wie in der vorlesung behandeln
+-argumente in klassen unterteilen (trifft voll zu, trifft zu, trifft kaum zu)
+-raster größer (uU nach monoton wählen)
+
+monton * flach * großes gefälle

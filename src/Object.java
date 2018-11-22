@@ -48,7 +48,7 @@ public class Object {
         position.z = maxZ.z;
         System.out.println("New Max Coord_pos: " + position);
         matrixList = Gatherer.getMatrix((int)position.x - size, (int)position.x + size, (int)position.y - size, (int)position.y + size);
-        normalize();
+//        normalize();
 //        System.out.println("Martix[0][0] = " + matrixList.get(0).get(0));
 
 //        List<Double> gradientsInX = new LinkedList<>();
@@ -59,7 +59,7 @@ public class Object {
             startPointX.moveOneY();
         }
         System.out.println("Gradienten in X: (incl. negativ)" + gradientsInX);
-        strictlyMonotonic(gradientsInX);
+//        strictlyMonotonic(gradientsInX);
         gradientsInX = gradientsInX.stream().map(x -> x < 0 ? x * -1 : x).collect(Collectors.toList());
 //        System.out.println("Gradienten in X: " + gradientsInX);
 
@@ -71,9 +71,10 @@ public class Object {
             startPointY.moveOneX();
         }
         System.out.println("Gradienten in Y: (incl. negativ)" + gradientsInY);
-        strictlyMonotonic(gradientsInY);
+//        strictlyMonotonic(gradientsInY);
         gradientsInY = gradientsInY.stream().map(x -> x < 0 ? x * -1 : x).collect(Collectors.toList());
 //        System.out.println("Gradienten in Y: " + gradientsInY);
+        strictlyMonotonic();
         System.out.println("strictly monotonic: [" + sMonotonic + "]");
     }
 
@@ -112,13 +113,31 @@ public class Object {
         return minMax;
     }
 
-    private void strictlyMonotonic(List<Double> values) {
+    private void strictlyMonotonic() {
         // TODO: muss eigentlich i = 0 und  -2 zwei sein !!! schränkt im moment den kreis für monoton ein. 1.25 streng monoton gilt auch für 25% nicht monoton
-        for (int i = 1; i < values.size() -3; i++) {
-            if ((i < size - 2) && values.get(i) * 1.25 < values.get(i+1))
-                sMonotonic = false;
-            if ((i >= size) && values.get(i) * 0.75 < values.get(i+1))
-                sMonotonic = false;
+//        for (int i = 1; i < values.size() -3; i++) {
+////            if ((i < size - 2) && values.get(i) * 1.25 < values.get(i+1))
+////                sMonotonic = false;
+////            if ((i >= size) && values.get(i) * 0.75 < values.get(i+1))
+////                sMonotonic = false;
+//            if ((i < size - 2) && values.get(i) > values.get(i+1)) break;
+//            if ((i < size - 2) && values.get(i) * 0.75 < values.get(i+1)) sMonotonic = false;
+//            if ((i >= size) && values.get(i) > values.get(i+1)) break;
+//            if ((i >= size) && values.get(i) * 1.25 < values.get(i+1)) sMonotonic = false;
+//        }
+        for (int i = size, j = size-1; i < size*2 - 1; i++, j--) {
+            // x ->
+            if (gradientsInX.get(i) < gradientsInX.get(i+1)) break;
+            if (gradientsInX.get(i) * 2 < gradientsInX.get(i+1)) sMonotonic = false;
+            // <- x
+            if (gradientsInX.get(j) > gradientsInX.get(j-1)) break;
+            if (gradientsInX.get(j) * 2 > gradientsInX.get(j-1)) sMonotonic = false;
+            // y ->
+            if (gradientsInY.get(i) < gradientsInY.get(i+1)) break;
+            if (gradientsInY.get(i) * 2 < gradientsInY.get(i+1)) sMonotonic = false;
+            // <- y
+            if (gradientsInY.get(j) > gradientsInY.get(j-1)) break;
+            if (gradientsInY.get(j) * 2 > gradientsInY.get(j-1)) sMonotonic = false;
         }
     }
 
@@ -139,7 +158,9 @@ public class Object {
 //    }
 
     private void flat() {
-        int whatsFlat = 200;
+        //TODO: magicvalues
+        int whatsFlat = (int)((200.0 / 10000.0) * (getMax(matrixList).z - getMin(matrixList).z));
+        System.out.println(whatsFlat);
         if (// x ->
             ((gradientsInX.get(size +2) + gradientsInX.get(size +1) + gradientsInX.get(size) ) < whatsFlat)
             ||// <- x

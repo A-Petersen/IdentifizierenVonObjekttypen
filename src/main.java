@@ -2,7 +2,7 @@ import org.jzy3d.analysis.AnalysisLauncher;
 
 public class main {
     public static void main(String[] args) throws Exception {
-        AnalysisLauncher.open(new Test(new View(66, 20, 'A'), true));
+        AnalysisLauncher.open(new Test(new View(13, 20, 'A'), true));
 //        AnalysisLauncher.open(new Test(new View(33, 8, 'A'), true));
 //        AnalysisLauncher.open(new Test(new View(64, 8, 'A'), true));
 //        AnalysisLauncher.open(new Test(new View(26, 8, 'B'), true));

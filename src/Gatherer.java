@@ -37,7 +37,7 @@ public class Gatherer {
         return coordsB;
     }
 
-    private static int objectMatrixSize = 4;
+    private static int objectMatrixSize = 20;
     public static int numRows_static = 1000; // 4943
     public static int numColumns_static = 1000; // 3000
 
@@ -53,12 +53,13 @@ public class Gatherer {
 //        System.out.println("\nMax A: " + objectsA.stream().max(Comparator.comparing(Object::getMax)).get().getMax());
 //        System.out.println("Min A: " + objectsA.stream().max(Comparator.comparing(Object::getMin)).get().getMin());
 //        System.out.println("Avg A: " + objectsA.stream().mapToDouble(Object::getMax).average().getAsDouble());
-        double numMaxValueA = objectsA.stream().filter(x -> x.getMax() < 10.0).count();
-        System.out.println("Filter A - max < 10:\t" + numMaxValueA + " out of " + objectsA.size());
+        double canyonA = objectsA.stream().filter(x -> x.getMax() > 10.0).count();
+//        System.out.println("Filter A - max < 10:\t" + canyonA + " out of " + objectsA.size());
         double numFlatA = objectsA.stream().filter(x -> x.isFlat()).count();
-        System.out.println("Filter A - Flat:\t" + numFlatA + " out of " + objectsA.size());
+//        System.out.println("Filter A - Flat:\t" + numFlatA + " out of " + objectsA.size());
         double numIsMonotonicA = objectsA.stream().filter(x -> x.issMonotonic()).count();
-        System.out.println("Filter A - monotonic:\t" + numIsMonotonicA + " out of " + objectsA.size());
+        double symA = objectsA.stream().filter(x -> x.isSymetric()).count();
+//        System.out.println("Filter A - monotonic:\t" + numIsMonotonicA + " out of " + objectsA.size());
 //        System.out.println("Filter A - monotonic && max < 10 && not Flat:\t" + objectsA.stream()
 //                .filter(x -> x.issMonotonic())
 //                .filter(x -> x.getMax() < 5.0)
@@ -68,12 +69,29 @@ public class Gatherer {
 //        System.out.println("Max B: " + objectsB.stream().max(Comparator.comparing(Object::getMax)).get().getMax());
 //        System.out.println("Min B: " + objectsB.stream().max(Comparator.comparing(Object::getMin)).get().getMin());
 //        System.out.println("Avg B: " + objectsB.stream().mapToDouble(Object::getMax).average().getAsDouble());
-        double numMaxValueB = objectsB.stream().filter(x -> x.getMax() < 10.0).count();
-        System.out.println("Filter B - max < 10:\t" + numMaxValueB + " out of " + objectsB.size());
+        double canyonB = objectsB.stream().filter(x -> x.getMax() > 10.0).count();
+//        System.out.println("Filter B - max < 10:\t" + canyonB + " out of " + objectsB.size());
         double numFlatB = objectsB.stream().filter(x -> x.isFlat()).count();
-        System.out.println("Filter B - Flat:\t" + numFlatB + " out of " + objectsB.size());
+//        System.out.println("Filter B - Flat:\t" + numFlatB + " out of " + objectsB.size());
         double numIsMonotonicB = objectsB.stream().filter(x -> x.issMonotonic()).count();
-        System.out.println("Filter B - monotonic:\t" + numIsMonotonicB + " out of " + objectsB.size());
+        double symB = objectsB.stream().filter(x -> x.isSymetric()).count();
+//        System.out.println("Filter B - monotonic:\t" + numIsMonotonicB + " out of " + objectsB.size());
+
+        double PA = objectsA.size() / (double)(objectsA.size() + objectsB.size());
+        double PB = objectsB.size() / (double)(objectsA.size() + objectsB.size());
+        System.out.println("P(A) = " + PA + "\tP(B) = " + PB + "\t of " + objectsA.size() + " Objects");
+
+        double PMonoA = numIsMonotonicA / objectsA.size();
+        double PFlatA = numFlatA / objectsA.size();
+        double PCanyonA = canyonA / objectsA.size();
+        double SymA = symA / objectsB.size();
+        System.out.println("P(Mono|A) = " + PMonoA + "\nP(Flat|A) = " + PFlatA + "\nP(Canyon|A) = " + PCanyonA + "\nP(Sym|A) = " + SymA);
+
+        double PMonoB = numIsMonotonicB / objectsB.size();
+        double PFlatB = numFlatB / objectsB.size();
+        double PCanyonB = canyonB / objectsB.size();
+        double SymB = symB / objectsB.size();
+        System.out.println("P(Mono|B) = " + PMonoB + "\nP(Flat|B) = " + PFlatB + "\nP(Canyon|B) = " + PCanyonB + "\nP(Sym|B) = " + SymB);
 //        System.out.println("Filter B - monotonic && max < 10 && not Flat:\t" + objectsB.stream()
 //                .filter(x -> x.issMonotonic())
 //                .filter(x -> x.getMax() < 5.0)
@@ -85,32 +103,6 @@ public class Gatherer {
         xyValueA = getXYValues('A');
         xyValueB = getXYValues('B');
         getZValues();
-//        meanA = mean(zValueA);
-//        meanB = mean(zValueB);
-//        coordsA = getCoords('A', 1000,1000,1,1, true);
-//        coordsB = getCoords('B', 1000,1000,1,1, true);
-//
-//        System.out.println("\nMax A: " + objectsA.stream().max(Comparator.comparing(Object::getMax)).get().getMax());
-//        System.out.println("Min A: " + objectsA.stream().max(Comparator.comparing(Object::getMin)).get().getMin());
-//        System.out.println("Avg A: " + objectsA.stream().mapToDouble(Object::getMax).average().getAsDouble());
-////        System.out.println("Filter A - max < 10:\t" + objectsA.stream().filter(x -> x.getMax() < 10.0).count() + " out of " + objectsA.size());
-//        System.out.println("Filter A - monotonic and max < 10:\t" + objectsA.stream()
-//                .filter(x -> x.issMonotonic())
-//                .filter(x -> x.getMax() < 5.0)
-//                .count() + " out of " + objectsA.size());
-//
-//        System.out.println("Max B: " + objectsB.stream().max(Comparator.comparing(Object::getMax)).get().getMax());
-//        System.out.println("Min B: " + objectsB.stream().max(Comparator.comparing(Object::getMin)).get().getMin());
-//        System.out.println("Avg B: " + objectsB.stream().mapToDouble(Object::getMax).average().getAsDouble());
-////        System.out.println("Filter B - max < 10:\t" + objectsB.stream().filter(x -> x.getMax() < 10.0).count() + " out of " + objectsB.size());
-//        System.out.println("Filter B - monotonic and max < 10:\t" + objectsB.stream()
-//                .filter(x -> x.issMonotonic())
-//                .filter(x -> x.getMax() < 5.0)
-//                .count() + " out of " + objectsB.size());
-
-//        Object testObj = new Object(coordsB.get(0), 2);
-//        System.out.println("MeanA: " + meanA + " | MeanB: " + meanB);
-
     }
 
     private void getZValues() throws IOException {

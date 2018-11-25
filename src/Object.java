@@ -108,25 +108,25 @@ public class Object {
         List<Double> values = new LinkedList<>();
         // TODO: Rechnet derzeit erst ab xy + 1, um eine platte Anfangsfäche zu berücksichtigen.
         // x ->
-        for (int i = 0; i < monotonicMatrix[0] -1; i++) {
+        for (int i = 1; i < monotonicMatrix[0]; i++) {
             values.add((gradientsInXpos.get(i + 1) / gradientsInXpos.get(i)));
         }
         // <- x
-        for (int i = 0; i < monotonicMatrix[1] -1; i++) {
+        for (int i = 1; i < monotonicMatrix[1]; i++) {
             values.add((gradientsInXneg.get(i + 1) / gradientsInXneg.get(i)));
         }
         // y ->
-        for (int i = 0; i < monotonicMatrix[3] -1; i++) {
+        for (int i = 1; i < monotonicMatrix[3]; i++) {
             values.add((gradientsInYneg.get(i + 1) / gradientsInYneg.get(i)));
         }
         // <- y
-        for (int i = 0; i < monotonicMatrix[2] -1; i++) {
+        for (int i = 1; i < monotonicMatrix[2]; i++) {
             values.add((gradientsInYpos.get(i + 1) / gradientsInYpos.get(i)));
         }
 
         System.out.println("Gradient Difference as Factor (From Center): " + values);
-        minMax[0] = values.stream().max(Comparator.comparing(Double::valueOf)).get();
-        minMax[1] = values.stream().min(Comparator.comparing(Double::valueOf)).get();
+        minMax[0] = values.isEmpty() ? 0 : values.stream().max(Comparator.comparing(Double::valueOf)).get();
+        minMax[1] = values.isEmpty() ? 0 : values.stream().min(Comparator.comparing(Double::valueOf)).get();
         return minMax;
     }
 

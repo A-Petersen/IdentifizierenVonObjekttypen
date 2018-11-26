@@ -92,6 +92,10 @@ public class Gatherer {
         double PCanyonB = canyonB / objectsB.size();
         double SymB = symB / objectsB.size();
         System.out.println("P(Mono|B) = " + PMonoB + "\nP(Flat|B) = " + PFlatB + "\nP(Canyon|B) = " + PCanyonB + "\nP(Sym|B) = " + SymB);
+
+        objectsA.stream().forEach(x -> x.calculateType(0.16846986089644514, 0.4311111111111111, 0.8, 0.06666666666666667, 0.7419724770642202, 0.2580275229357798));
+        System.out.println("HI: " + objectsA.stream().filter(x -> x.calcRight()).count());
+
 //        System.out.println("Filter B - monotonic && max < 10 && not Flat:\t" + objectsB.stream()
 //                .filter(x -> x.issMonotonic())
 //                .filter(x -> x.getMax() < 5.0)

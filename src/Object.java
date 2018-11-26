@@ -7,8 +7,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.lang.Math.log;
+
 public class Object {
     private char type;
+    private char calculatedType;
     private Coord3d position;
     private int size;
     List<List<Integer>> matrixList = new LinkedList<>();
@@ -22,6 +25,7 @@ public class Object {
     private List<Double> symetricInY = new LinkedList<>();
     private boolean symetric = false;
     private boolean flat = false;
+    private boolean canyon = false;
 
     private int[] monotonicMatrix = {0,0,0,0};
 
@@ -127,6 +131,7 @@ public class Object {
         System.out.println("Gradient Difference as Factor (From Center): " + values);
         minMax[0] = values.isEmpty() ? 0 : values.stream().max(Comparator.comparing(Double::valueOf)).get();
         minMax[1] = values.isEmpty() ? 0 : values.stream().min(Comparator.comparing(Double::valueOf)).get();
+        if (minMax[0] > 10.0) canyon = true;
         return minMax;
     }
 
@@ -180,13 +185,14 @@ public class Object {
             ||gradientsInYpos.size() < 4) return;
 
         if (    // x ->
-            ((gradientsInXpos.get(3) + gradientsInXpos.get(2) + gradientsInXpos.get(1) ) * -1 < whatsFlat)
-            ||  // <- x
-            ((gradientsInXneg.get(3) + gradientsInXneg.get(2) + gradientsInXneg.get(1) ) * -1 < whatsFlat)
-            ||  // <- y
-            ((gradientsInYneg.get(3) + gradientsInYneg.get(2) + gradientsInYneg.get(1) ) * -1 < whatsFlat)
-            ||  // y ->
-            ((gradientsInYpos.get(3) + gradientsInYpos.get(2) + gradientsInYpos.get(1) ) * -1 < whatsFlat))
+                (((gradientsInXpos.get(3) + gradientsInXpos.get(2) + gradientsInXpos.get(1) ) * -1 < whatsFlat)
+                ||  // <- x
+                ((gradientsInXneg.get(3) + gradientsInXneg.get(2) + gradientsInXneg.get(1) ) * -1 < whatsFlat))
+            ||
+                // <- y
+                (((gradientsInYneg.get(3) + gradientsInYneg.get(2) + gradientsInYneg.get(1) ) * -1 < whatsFlat)
+                ||  // y ->
+                ((gradientsInYpos.get(3) + gradientsInYpos.get(2) + gradientsInYpos.get(1) ) * -1 < whatsFlat)))
         {
             flat = true;
         }
@@ -267,6 +273,33 @@ public class Object {
 
     public boolean isSymetric() {
         return symetric;
+    }
+
+    public void calculateType(double pCanyonA, double pCanyonB, double pSymA, double pSymB, double pA, double pB) {
+
+        double PAattr = ( ( canyon ? -log(pCanyonA)
+                                : -log(1 - pCanyonA) )
+                        +
+                        (symetric ? -log(pSymA)
+                                : -log(1 - pSymA) )
+                        +
+                        ( -log(pA) ) );
+
+        double PBattr = ( ( canyon ? -log(pCanyonB)
+                        : -log(1 - pCanyonB) )
+                        +
+                        (symetric ? -log(pSymB)
+                                : -log(1 - pSymB) )
+                        +
+                        ( -log(pB) ) );
+
+        double Q = PAattr / PBattr;
+
+        if (Q > 1) calculatedType = 'B';
+    }
+
+    public boolean calcRight() {
+        return calculatedType == type;
     }
 
     private void normalize() {

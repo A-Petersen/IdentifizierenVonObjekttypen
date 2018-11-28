@@ -62,7 +62,7 @@ public class Gatherer {
 
         double PA = objectsA.size() / (double)(objectsA.size() + objectsB.size());
         double PB = objectsB.size() / (double)(objectsA.size() + objectsB.size());
-        System.out.println("P(A) = " + PA + "\tP(B) = " + PB + "\t of " + (objectsA.size() + objectsB.size()) + " Objects");
+        System.out.println("\n\nP(A) = " + PA + "\tP(B) = " + PB + "\t of " + (objectsA.size() + objectsB.size()) + " Objects");
 
         double PMonoA = numIsMonotonicA / objectsA.size();
         double PFlatA = numFlatA / objectsA.size();

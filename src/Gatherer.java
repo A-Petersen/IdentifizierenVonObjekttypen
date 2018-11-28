@@ -36,7 +36,7 @@ public class Gatherer {
     }
 
     private static int objectMatrixSize = 20;
-    public static int numRows_static = 4943;        // 4943
+    public static int numRows_static = 3000;        // 4943
     public static int numColumns_static = 3000;     // 3000
 
     Gatherer(boolean xyz) throws IOException {
@@ -187,7 +187,8 @@ public class Gatherer {
                             y <= ySize) {
                         Coord3d coord = new Coord3d(entry.getKey() - xStart, y - yStart, object.get(count));
                         list.add(coord);
-                        System.out.println("\n" + type + ": " + entry.getKey() + "-" + entry.getValue() + "-" + object.get(count) + " Index[" + (list.size() - 1) + "]");
+                        System.out.println("\n------------------------------------------------------------------------------------------\n"
+                                + type + ": " + entry.getKey() + "-" + entry.getValue() + "-" + object.get(count) + " Index[" + (list.size() - 1) + "]");
                         if (type == 'A' && createObjects) {
                             objectsA.add(new Object(coord, objectMatrixSize, 'A'));
                         } else if (createObjects) {
@@ -229,14 +230,14 @@ public class Gatherer {
         Iterable<CSVRecord> rows = CSVFormat.EXCEL.parse(data);
         for (CSVRecord row : rows) {
             List<Integer> dataListInner = new LinkedList<>();
-            for (int i = yStart; i <= ySize; i++) {
+            for (int i = yStart; i < ySize; i++) {
                 if (count >= xStart) dataListInner.add(Integer.parseInt(row.get(i).replace(".", "")));
             }
             if (count >= xStart) dataList.add(dataListInner);
             if (count == xSize) break;
             count++;
         }
-        System.out.println(dataList.size() + " | " + dataList.get(0).size());
+        System.out.println("Matrix: [" + dataList.size() + " | " + dataList.get(0).size() + "]");
         return dataList;
     }
 

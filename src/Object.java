@@ -26,9 +26,9 @@ public class Object {
     private boolean symetric = false;
     private boolean flat = false;
     private boolean canyon = false;
+    private double hight;
 
     private int[] monotonicMatrix = {0,0,0,0};
-
 
     public double getMin() {
         return minMax[1];
@@ -46,6 +46,7 @@ public class Object {
         flat();
         symetric();
         minMax = maxGradientChange();
+        hight = getMax(matrixList).z - getMin(matrixList).z;
         System.out.println("Max: " + minMax[0] + " \t Min: " + minMax[1] + "\nFlat[" + flat + "]");
     }
 
@@ -178,25 +179,46 @@ public class Object {
 
     private void flat() {
         //TODO: magicvalues
-        int whatsFlat = (int)(0.02 * (getMax(matrixList).z - getMin(matrixList).z));
-        if (gradientsInXpos.size() < 4
-            ||gradientsInXneg.size() < 4
-            ||gradientsInYneg.size() < 4
-            ||gradientsInYpos.size() < 4) return;
+//        int whatsFlat = (int)(0.02 * (getMax(matrixList).z - getMin(matrixList).z));
+//        if (gradientsInXpos.size() < 4
+//            ||gradientsInXneg.size() < 4
+//            ||gradientsInYneg.size() < 4
+//            ||gradientsInYpos.size() < 4) return;
+//        if (
+//                // x ->
+//                (((gradientsInXpos.get(3) + gradientsInXpos.get(2) + gradientsInXpos.get(1) ) * -1 < whatsFlat)
+//                ||  // <- x
+//                ((gradientsInXneg.get(3) + gradientsInXneg.get(2) + gradientsInXneg.get(1) ) * -1 < whatsFlat))
+//            ||
+//                // <- y
+//                (((gradientsInYneg.get(3) + gradientsInYneg.get(2) + gradientsInYneg.get(1) ) * -1 < whatsFlat)
+//                ||  // y ->
+//                ((gradientsInYpos.get(3) + gradientsInYpos.get(2) + gradientsInYpos.get(1) ) * -1 < whatsFlat)))
+//        {
+//            flat = true;
+//        }
+        // x ->
+        double flatFactor = 0.8;
+        int counter = 0;
+        for (int i = 0; i < gradientsInXpos.size() -1; i++) {
+            if (gradientsInXpos.get(i) < gradientsInXpos.get(i+1) * flatFactor)
+            {
+                counter++;
 
-        if (    // x ->
-                (((gradientsInXpos.get(3) + gradientsInXpos.get(2) + gradientsInXpos.get(1) ) * -1 < whatsFlat)
-                ||  // <- x
-                ((gradientsInXneg.get(3) + gradientsInXneg.get(2) + gradientsInXneg.get(1) ) * -1 < whatsFlat))
-            ||
-                // <- y
-                (((gradientsInYneg.get(3) + gradientsInYneg.get(2) + gradientsInYneg.get(1) ) * -1 < whatsFlat)
-                ||  // y ->
-                ((gradientsInYpos.get(3) + gradientsInYpos.get(2) + gradientsInYpos.get(1) ) * -1 < whatsFlat)))
-        {
-            flat = true;
+            }
         }
-
+        // <- x
+        for (int i = 0; i < gradientsInXneg.size() -1; i++) {
+            if (gradientsInXneg.get(i) < gradientsInXneg.get(i + 1) * flatFactor) break;
+        }
+        // y ->
+        for (int i = 0; i < gradientsInYpos.size() -1; i++) {
+            if (gradientsInYpos.get(i) < gradientsInYpos.get(i + 1) * flatFactor) break;
+        }
+        // <- y
+        for (int i = 0; i < gradientsInYneg.size() -1; i++) {
+            if (gradientsInYneg.get(i) < gradientsInYneg.get(i + 1) * flatFactor) break;
+        }
     }
 
     private void symetric() {
@@ -284,6 +306,13 @@ public class Object {
                                 : -log(1 - pSymA) )
                         +
                         ( -log(pA) ) );
+        double PAattrM = ( ( canyon ? (pCanyonA)
+                : (1 - pCanyonA) )
+                *
+                (symetric ? (pSymA)
+                        : (1 - pSymA) )
+                *
+                ( (pA) ) );
 
         double PBattr = ( ( canyon ? -log(pCanyonB)
                         : -log(1 - pCanyonB) )
@@ -292,14 +321,30 @@ public class Object {
                                 : -log(1 - pSymB) )
                         +
                         ( -log(pB) ) );
+        double PBattrM = ( ( canyon ? (pCanyonB)
+                : (1 - pCanyonB) )
+                *
+                (symetric ? (pSymB)
+                        : (1 - pSymB) )
+                *
+                ( (pB) ) );
 
         double Q = PAattr / PBattr;
+        double QM = PAattrM / PBattrM;
 
-        if (Q > 1) calculatedType = 'B';
+        if (QM > 1) {
+            calculatedType = 'B';
+        } else {
+            calculatedType = 'A';
+        }
     }
 
     public boolean calcRight() {
         return calculatedType == type;
+    }
+
+    public double getHight() {
+        return hight;
     }
 
     private void normalize() {

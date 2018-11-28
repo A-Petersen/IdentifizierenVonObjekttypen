@@ -20,6 +20,8 @@ import java.util.List;
 
 public class Test extends AbstractAnalysis {
 
+    private Coord3d coord;
+    private char type;
     private int xSize;
     private int xStart;
     private int ySize;
@@ -31,14 +33,16 @@ public class Test extends AbstractAnalysis {
         xStart = view.getxStart();
         ySize = view.getySize();
         yStart = view.getyStart();
+        type = view.getType();
+        coord = view.getCoord();
         this.grid = grid;
     }
     @Override
     public void init() throws IOException {
 
-        Gatherer points = new Gatherer();
-        List<Coord3d> coordsA = points.getCoords('A', xSize, ySize, xStart, yStart, false);
-        List<Coord3d> coordsB = points.getCoords('B', xSize, ySize, xStart, yStart, false);
+//        Gatherer points = new Gatherer();
+//        List<Coord3d> coordsA = points.getCoords('A', xSize, ySize, xStart, yStart, false);
+//        List<Coord3d> coordsB = points.getCoords('B', xSize, ySize, xStart, yStart, false);
 
         List<List<Integer>> data = Gatherer.getMatrix(xStart, xSize, yStart, ySize);
 
@@ -68,8 +72,17 @@ public class Test extends AbstractAnalysis {
         chart.getAxeLayout().setYAxeLabel( "y-test" );
         chart.getAxeLayout().setZAxeLabel( "z-test" );
 
-        coordsA.forEach(x  -> chart.addDrawable(new Point(new Coord3d(x.x-1, x.y-1, x.z), Color.RED, 20)));
-        coordsB.forEach(x  -> chart.addDrawable(new Point(new Coord3d(x.x-1, x.y-1, x.z), Color.GREEN, 20)));
+        if (type == 'A') {
+            System.out.println(coord);
+            chart.addDrawable(new Point(coord, Color.RED, 20));
+        }else{
+            System.out.println(coord);
+            chart.addDrawable(new Point(coord, Color.GREEN, 20));
+        }
+
+//        coordsB.forEach(x -> System.out.println(x));
+//        coordsA.forEach(x  -> chart.addDrawable(new Point(new Coord3d(x.x-1, x.y-1, x.z), Color.RED, 20)));
+//        coordsB.forEach(x  -> chart.addDrawable(new Point(new Coord3d(x.x-1, x.y-1, x.z), Color.GREEN, 20)));
 //        coordsB.forEach(x-> System.out.println(x));
 //        Point abc = new Point(new Coord3d(100.0,100.0,100.0), Color.RED, 5);
 //        chart.addDrawable(abc);

@@ -430,4 +430,8 @@ public class Object {
 //        matrixList.stream().forEach(x -> x.stream().forEach(y-> System.out.println(y)));
         //Gradienten in X: (incl. negativ)[1204.0, 901.0, 602.0, 336.0, 127.0, -93.0, -563.0, -1099.0, -1738.0, -2179.0]
     }
+
+    public Coord3d getPosition() {
+        return position;
+    }
 }

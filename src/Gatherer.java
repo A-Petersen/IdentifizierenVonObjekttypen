@@ -36,8 +36,8 @@ public class Gatherer {
     }
 
     private static int objectMatrixSize = 20;
-    public static int numRows_static = 4943; // 4943
-    public static int numColumns_static = 3000; // 3000
+    public static int numRows_static = 4943;        // 4943
+    public static int numColumns_static = 3000;     // 3000
 
     Gatherer(boolean xyz) throws IOException {
         xyValueA = getXYValues('A');
@@ -84,7 +84,7 @@ public class Gatherer {
                 + " \tB_right: "
                 + objectsB.stream().filter(x -> x.calcRight()).count() + " TP[" + (objectsB.stream().filter(x -> x.calcRight()).count() / (double)objectsB.size()) + "]"
                 + " \tA_false: "
-                + objectsA.stream().filter(x -> !x.calcRight()).count() + " FP[" + (objectsB.stream().filter(x -> !x.calcRight()).count() / (double)objectsA.size()) + "]"
+                + objectsA.stream().filter(x -> !x.calcRight()).count() + " FP[" + (objectsA.stream().filter(x -> !x.calcRight()).count() / (double)objectsA.size()) + "]"
                 + " \tB_false: "
                 + objectsB.stream().filter(x -> !x.calcRight()).count()
         );

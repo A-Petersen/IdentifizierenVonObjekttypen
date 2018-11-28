@@ -2,12 +2,10 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.jzy3d.maths.Coord3d;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Gatherer {
     public static void main(String[] args) throws Exception {
@@ -17,8 +15,8 @@ public class Gatherer {
 
     // Koordinaten (Spalte,Zeile)
 
-    private Map<Integer, Integer> xyValueA = new LinkedHashMap<>();
-    private Map<Integer, Integer> xyValueB = new LinkedHashMap<>();
+    private Map<Integer, List<Integer>> xyValueA = new LinkedHashMap<>();
+    private Map<Integer, List<Integer>> xyValueB = new LinkedHashMap<>();
     private List<Integer> zValueA = new LinkedList<>();
     private List<Integer> zValueB = new LinkedList<>();
     private List<Coord3d> coordsA = new LinkedList<>();
@@ -38,8 +36,8 @@ public class Gatherer {
     }
 
     private static int objectMatrixSize = 20;
-    public static int numRows_static = 2000; // 4943
-    public static int numColumns_static = 2000; // 3000
+    public static int numRows_static = 4943; // 4943
+    public static int numColumns_static = 3000; // 3000
 
     Gatherer(boolean xyz) throws IOException {
         xyValueA = getXYValues('A');
@@ -50,45 +48,53 @@ public class Gatherer {
         coordsA = getCoords('A', numRows_static,numColumns_static,1,1, true);
         coordsB = getCoords('B', numRows_static,numColumns_static,1,1, true);
 
-        double canyonA = objectsA.stream().filter(x -> x.getMax() > 10.0).count();
+        double canyonA = objectsA.stream().filter(x -> x.getMax() > 6.0).count();
         double numFlatA = objectsA.stream().filter(Object::isFlat).count();
         double numIsMonotonicA = objectsA.stream().filter(Object::issMonotonic).count();
-        double symA = objectsA.stream().filter(Object::isSymetric).count();
+        double symAw = objectsA.stream().filter(Object::isWeakSymetric).count();
+        double symAs = objectsA.stream().filter(Object::isStrongSymetric).count();
 
-        double canyonB = objectsB.stream().filter(x -> x.getMax() > 10.0).count();
+        double canyonB = objectsB.stream().filter(x -> x.getMax() > 6.0).count();
         double numFlatB = objectsB.stream().filter(Object::isFlat).count();
         double numIsMonotonicB = objectsB.stream().filter(Object::issMonotonic).count();
-        double symB = objectsB.stream().filter(Object::isSymetric).count();
+        double symBw = objectsB.stream().filter(Object::isWeakSymetric).count();
+        double symBs = objectsB.stream().filter(Object::isStrongSymetric).count();
 
         double PA = objectsA.size() / (double)(objectsA.size() + objectsB.size());
         double PB = objectsB.size() / (double)(objectsA.size() + objectsB.size());
-        System.out.println("\n\nP(A) = " + PA + "\tP(B) = " + PB + "\t of " + (objectsA.size() + objectsB.size()) + " Objects");
+        System.out.println("\n\nP(A) = " + PA + "\tP(B) = " + PB + "\t of " + (objectsA.size() + objectsB.size()) + " Objects [A=" + objectsA.size() + "] B[" + objectsB.size() + "]");
 
         double PMonoA = numIsMonotonicA / objectsA.size();
         double PFlatA = numFlatA / objectsA.size();
         double PCanyonA = canyonA / objectsA.size();
-        double SymA = symA / objectsB.size();
-        System.out.println("P(Mono|A) = " + PMonoA + "\nP(Flat|A) = " + PFlatA + "\nP(Canyon|A) = " + PCanyonA + "\nP(Sym|A) = " + SymA);
+        double SymAw = symAw / objectsA.size();
+        double SymAs = symAs / objectsA.size();
+        System.out.println("P(Mono|A) = " + PMonoA + "\nP(Flat|A) = " + PFlatA + "\nP(Canyon|A) = " + PCanyonA + "\nP(SymWeak|A) = " + SymAw + "\nP(SymStrong|A) = " + SymAs);
 
         double PMonoB = numIsMonotonicB / objectsB.size();
         double PFlatB = numFlatB / objectsB.size();
         double PCanyonB = canyonB / objectsB.size();
-        double SymB = symB / objectsB.size();
-        System.out.println("P(Mono|B) = " + PMonoB + "\nP(Flat|B) = " + PFlatB + "\nP(Canyon|B) = " + PCanyonB + "\nP(Sym|B) = " + SymB);
+        double SymBw = symBw / objectsB.size();
+        double SymBs = symBs / objectsB.size();
+        System.out.println("P(Mono|B) = " + PMonoB + "\nP(Flat|B) = " + PFlatB + "\nP(Canyon|B) = " + PCanyonB + "\nP(SymWeak|B) = " + SymBw + "\nP(SymStrong|B) = " + SymBs);
 
-        objectsA.stream().forEach(x -> x.calculateType(0.16846986089644514, 0.4311111111111111, 0.8, 0.06666666666666667, 0.7419724770642202, 0.2580275229357798));
-        System.out.println("\nA_right: "
+        System.out.println(
+                "\nA_right: "
                 + objectsA.stream().filter(x -> x.calcRight()).count()
                 + " \tB_right: "
-                + objectsB.stream().filter(x -> x.calcRight()).count()
+                + objectsB.stream().filter(x -> x.calcRight()).count() + " TP[" + (objectsB.stream().filter(x -> x.calcRight()).count() / (double)objectsB.size()) + "]"
                 + " \tA_false: "
-                + objectsA.stream().filter(x -> !x.calcRight()).count()
+                + objectsA.stream().filter(x -> !x.calcRight()).count() + " FP[" + (objectsB.stream().filter(x -> !x.calcRight()).count() / (double)objectsA.size()) + "]"
                 + " \tB_false: "
                 + objectsB.stream().filter(x -> !x.calcRight()).count()
         );
 
-        System.out.println("AvgHightA: " + objectsA.stream().mapToDouble(Object::getHight).average());
-        System.out.println("AvgHightB: " + objectsB.stream().mapToDouble(Object::getHight).average());
+//        System.out.println("AvgHightA: " + objectsA.stream().mapToDouble(Object::getHight).average());
+//        System.out.println("AvgHightB: " + objectsB.stream().mapToDouble(Object::getHight).average());
+//
+//        System.out.println("AvgFGA: " + objectsA.stream().mapToDouble(Object::getFlatGradients).average());
+//        System.out.println("AvgFGB: " + objectsB.stream().mapToDouble(Object::getFlatGradients).average());
+
     }
 
     Gatherer() throws IOException {
@@ -104,27 +110,37 @@ public class Gatherer {
 
         for (CSVRecord row : rows) {
             if (xyValueA.containsKey(count)) {
-                zValueA.add(Integer.parseInt(row.get(xyValueA.get(count) -1).replace(".", "")));
+                xyValueA.get(count).stream().forEach(x -> zValueA.add(Integer.parseInt(row.get(x - 1).replace(".", ""))) );
+//                zValueA.add(Integer.parseInt(row.get(xyValueA.get(count) -1).replace(".", "")));
             }
             if (xyValueB.containsKey(count)) {
-                zValueB.add(Integer.parseInt(row.get(xyValueB.get(count) -1).replace(".", "")));
+                xyValueB.get(count).stream().forEach(x -> zValueB.add(Integer.parseInt(row.get(x - 1).replace(".", ""))) );
+//                zValueB.add(Integer.parseInt(row.get(xyValueB.get(count) -1).replace(".", "")));
             }
             count++;
             numRows++;
         }
-
+        System.out.println("ZValueA: " + zValueA.size());
+        System.out.println("ZValueB: " + zValueB.size());
     }
 
     private LinkedHashMap getXYValues(char object) throws IOException {
         Reader data = new FileReader("Data/" + object + "0.csv");
         Iterable<CSVRecord> rows = CSVFormat.EXCEL.parse(data);
-        Map<Integer, Integer> unsorted = new HashMap<>();
-        Map<Integer, Integer> sorted = new LinkedHashMap<>();
+        Map<Integer, List<Integer>> unsorted = new HashMap<>();
+        Map<Integer, List<Integer>> sorted = new LinkedHashMap<>();
         for (CSVRecord row : rows) {
             Integer rowValue = Integer.parseInt(row.get(1));
             Integer columnValue = Integer.parseInt(row.get(0));
             if (object == 'A' || object == 'B') {
-                unsorted.put(rowValue, columnValue);
+                if (!unsorted.containsKey(rowValue)) {
+                    List<Integer> list = new LinkedList<>();
+                    list.add(columnValue);
+                    unsorted.put(rowValue, list);
+                } else {
+                    unsorted.get(rowValue).add(columnValue);
+                }
+
             } else {
                 System.err.println("Methode mit fehlerhaften Parametern genutzt!");
             }
@@ -133,6 +149,8 @@ public class Gatherer {
                 .stream()
                 .sorted(Map.Entry.comparingByKey())
                 .forEachOrdered(x -> sorted.put(x.getKey(), x.getValue()));
+        System.out.println(object + " - " + sorted.size());
+        System.out.println(sorted.values().stream().mapToInt(List::size).sum());
         return (LinkedHashMap) sorted;
     }
 
@@ -147,7 +165,7 @@ public class Gatherer {
     public List<Coord3d> getCoords(char type, int xSize, int ySize, int xStart, int yStart, boolean createObjects) throws IOException {
         List<Coord3d> list = new LinkedList<>();
         List<Integer> object = new LinkedList<>();
-        Map<Integer, Integer> map = new LinkedHashMap<>();
+        Map<Integer, List<Integer>> map = new LinkedHashMap<>();
         if (type == 'A') {
             map = xyValueA;
             object = zValueA;
@@ -157,24 +175,44 @@ public class Gatherer {
         }
         int count = 0;
 
-        for (Map.Entry<Integer,Integer> entry : map.entrySet()) {
-            if (entry.getKey() <= xSize &&
-                entry.getKey() > xStart &&
-                entry.getValue() > yStart &&
-                entry.getValue() <= ySize)
-            {
-                Coord3d coord = new Coord3d(entry.getKey() - xStart, entry.getValue() - yStart, object.get(count));
-                list.add(coord);
-                System.out.println("\n" + type + ": " + entry.getKey() + "-" + entry.getValue() + "-" + object.get(count) + " Index[" + (list.size() - 1) + "]");
-                if (type == 'A' && createObjects) {
-                    objectsA.add(new Object(coord, objectMatrixSize, 'A'));
-                } else if (createObjects) {
-                    objectsB.add(new Object(coord, objectMatrixSize, 'B'));
-                }
-            }
-            count++;
-        }
+        System.out.println("getCoordsSizeB: " + map.values().stream().mapToInt(List::size).sum());
+        System.out.println(map);
 
+        for (Map.Entry<Integer, List<Integer>> entry : map.entrySet()) {
+            if (entry.getKey() <= xSize &&
+                entry.getKey() >= xStart)
+            {
+                for (Integer y : entry.getValue()) {
+                    if( y >= yStart &&
+                            y <= ySize) {
+                        Coord3d coord = new Coord3d(entry.getKey() - xStart, y - yStart, object.get(count));
+                        list.add(coord);
+                        System.out.println("\n" + type + ": " + entry.getKey() + "-" + entry.getValue() + "-" + object.get(count) + " Index[" + (list.size() - 1) + "]");
+                        if (type == 'A' && createObjects) {
+                            objectsA.add(new Object(coord, objectMatrixSize, 'A'));
+                        } else if (createObjects) {
+                            objectsB.add(new Object(coord, objectMatrixSize, 'B'));
+                        }
+                    }
+                    count++;
+                }
+//                if( entry.getValue() > yStart &&
+//                        entry.getValue() <= ySize)
+//                {
+//                    Coord3d coord = new Coord3d(entry.getKey() - xStart, entry.getValue() - yStart, object.get(count));
+//                    list.add(coord);
+//                    System.out.println("\n" + type + ": " + entry.getKey() + "-" + entry.getValue() + "-" + object.get(count) + " Index[" + (list.size() - 1) + "]");
+//                    if (type == 'A' && createObjects) {
+//                        objectsA.add(new Object(coord, objectMatrixSize, 'A'));
+//                    } else if (createObjects) {
+//                        objectsB.add(new Object(coord, objectMatrixSize, 'B'));
+//                    }
+//                }
+//                count++;
+            }
+
+        }
+        System.out.println("Count: " + count);
         return list;
     }
 

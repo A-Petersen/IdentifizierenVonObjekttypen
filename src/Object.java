@@ -23,8 +23,10 @@ public class Object {
     private boolean sMonotonic = true;
     private List<Double> symetricInX = new LinkedList<>();
     private List<Double> symetricInY = new LinkedList<>();
-    private boolean symetric = false;
+    private boolean symetricWeak = false;
+    private boolean symetricStrong = false;
     private boolean flat = false;
+    private int flatGradients = 0;
     private boolean canyon = false;
     private double hight;
 
@@ -45,9 +47,12 @@ public class Object {
         gatherGradients();
         flat();
         symetric();
+        fastSharp();
         minMax = maxGradientChange();
         hight = getMax(matrixList).z - getMin(matrixList).z;
         System.out.println("Max: " + minMax[0] + " \t Min: " + minMax[1] + "\nFlat[" + flat + "]");
+        calculateType(0.3276661514683153, 0.6133333333333333, 0.1561051004636785, 0.2, 0.3894899536321484, 0.14666666666666667, 0.04482225656877898, 0.017777777777777778, 0.7419724770642202, 0.2580275229357798);
+        System.out.println("Correct Type: [" + calcRight() + "]");
     }
 
     public void gatherGradients() throws IOException {
@@ -128,12 +133,27 @@ public class Object {
         for (int i = 1; i < monotonicMatrix[2]; i++) {
             values.add((gradientsInYpos.get(i + 1) / gradientsInYpos.get(i)));
         }
-
-        System.out.println("Gradient Difference as Factor (From Center): " + values);
         minMax[0] = values.isEmpty() ? 0 : values.stream().max(Comparator.comparing(Double::valueOf)).get();
         minMax[1] = values.isEmpty() ? 0 : values.stream().min(Comparator.comparing(Double::valueOf)).get();
-        if (minMax[0] > 10.0) canyon = true;
+        if (minMax[0] > 6.0) canyon = true;
+        System.out.println("Canyon : [" + canyon + "]");
         return minMax;
+    }
+
+    private void fastSharp() {
+        double whatsSharp = 5000;
+//                (0.25 * (getMax(matrixList).z - getMin(matrixList).z));
+        if (
+                (gradientsInXpos.get(0) + gradientsInXpos.get(1)) *-1 > whatsSharp
+                ||
+                (gradientsInXneg.get(0) + gradientsInXneg.get(1)) *-1 > whatsSharp
+                ||
+                (gradientsInYpos.get(0) + gradientsInYpos.get(1)) *-1 > whatsSharp
+                ||
+                (gradientsInYneg.get(0) + gradientsInYneg.get(1)) *-1 > whatsSharp
+        ) {
+            canyon = true;
+        }
     }
 
     private void strictlyMonotonic() {
@@ -177,6 +197,10 @@ public class Object {
         System.out.println("x -> " + monotonicMatrix[0] + " | <- x " + monotonicMatrix[1] + " | <- y (up) " + monotonicMatrix[2] + " | y -> (down) " + monotonicMatrix[3]);
     }
 
+    public int getFlatGradients() {
+        return flatGradients;
+    }
+
     private void flat() {
         //TODO: magicvalues
 //        int whatsFlat = (int)(0.02 * (getMax(matrixList).z - getMin(matrixList).z));
@@ -198,27 +222,44 @@ public class Object {
 //            flat = true;
 //        }
         // x ->
-        double flatFactor = 0.8;
+        int whatsFlat = (int)(0.01 * (getMax(matrixList).z - getMin(matrixList).z));
+        int maxGradChange = 3;
         int counter = 0;
-        for (int i = 0; i < gradientsInXpos.size() -1; i++) {
-            if (gradientsInXpos.get(i) < gradientsInXpos.get(i+1) * flatFactor)
+        //TODO: i = 1 !!!! direkte erste nachbarn nicht beachten.
+        for (int i = 1; i < gradientsInXpos.size() - 1; i++) {
+            if (gradientsInXpos.get(i + 1) / gradientsInXpos.get(i) > maxGradChange) break;
+            if (gradientsInXpos.get(i) *-1 < whatsFlat)
             {
                 counter++;
-
             }
         }
         // <- x
-        for (int i = 0; i < gradientsInXneg.size() -1; i++) {
-            if (gradientsInXneg.get(i) < gradientsInXneg.get(i + 1) * flatFactor) break;
+        for (int i = 1; i < gradientsInXneg.size() -1; i++) {
+            if (gradientsInXneg.get(i + 1) / gradientsInXneg.get(i) > maxGradChange) break;
+            if (gradientsInXneg.get(i) *-1 < whatsFlat)
+            {
+                counter++;
+            }
         }
         // y ->
-        for (int i = 0; i < gradientsInYpos.size() -1; i++) {
-            if (gradientsInYpos.get(i) < gradientsInYpos.get(i + 1) * flatFactor) break;
+        for (int i = 1; i < gradientsInYpos.size() -1; i++) {
+            if (gradientsInYpos.get(i + 1) / gradientsInYpos.get(i) > maxGradChange) break;
+            if (gradientsInYpos.get(i) *-1 < whatsFlat)
+            {
+                counter++;
+            }
         }
         // <- y
-        for (int i = 0; i < gradientsInYneg.size() -1; i++) {
-            if (gradientsInYneg.get(i) < gradientsInYneg.get(i + 1) * flatFactor) break;
+        for (int i = 1; i < gradientsInYneg.size() -1; i++) {
+            if (gradientsInYneg.get(i + 1) / gradientsInYneg.get(i) > maxGradChange) break;
+            if (gradientsInYneg.get(i) *-1 < whatsFlat)
+            {
+                counter++;
+            }
         }
+        flatGradients = counter;
+        if (flatGradients > 15) flat = true;
+        System.out.println("FlatCounter[" + flatGradients + "]");
     }
 
     private void symetric() {
@@ -226,15 +267,20 @@ public class Object {
         for (int i = 1; i < sizeX; i++) {
             symetricInX.add(gradientsInXneg.get(i) / gradientsInXpos.get(i));
         }
-        System.out.println("SymFactorX: " + symetricInX + "\n|[" + symetricInX.stream().filter(x -> 0.7 < x && x < 1.3).count());
-        symetric = symetricInX.stream().filter(x -> 0.7 < x && x < 1.3).count() > 5 ? true : false;
+        System.out.println("Amount of Symetric Gradients in X: [" + symetricInX.stream().filter(x -> 0.7 < x && x < 1.3).count() + "]");
+        boolean inX = symetricInX.stream().filter(x -> 0.7 < x && x < 1.3).count() > 5 ? true : false;
 
         int sizeY = gradientsInYpos.size() > gradientsInYneg.size() ? gradientsInYneg.size() : gradientsInYpos.size();
         for (int i = 1; i < sizeY; i++) {
             symetricInY.add(gradientsInYneg.get(i) / gradientsInYpos.get(i));
         }
-        System.out.println("SymFactorY: " + symetricInY + "\n|[" + symetricInY.stream().filter(x -> 0.7 < x && x < 1.3).count());
-        symetric = symetricInY.stream().filter(x -> 0.7 < x && x < 1.3).count() > 5 ? true : false;
+        System.out.println("Amount of Symetric Gradients in Y: [" + symetricInY.stream().filter(x -> 0.7 < x && x < 1.3).count() + "]");
+        boolean inY = symetricInY.stream().filter(x -> 0.7 < x && x < 1.3).count() > 5 ? true : false;
+
+        symetricWeak = inX || inY;
+        symetricStrong = inX && inY;
+
+        System.out.println("Weak Symetric: [" + symetricWeak + "]" + "\tStrong Symetric: [" + symetricStrong + "]");
     }
 
     private Coord3d getMax(List<List<Integer>> matrixList) {
@@ -293,49 +339,67 @@ public class Object {
         return flat;
     }
 
-    public boolean isSymetric() {
-        return symetric;
+    public boolean isWeakSymetric() {
+        return symetricWeak;
     }
 
-    public void calculateType(double pCanyonA, double pCanyonB, double pSymA, double pSymB, double pA, double pB) {
+    public boolean isStrongSymetric() {
+        return symetricStrong;
+    }
+
+    public void calculateType(double pCanyonA, double pCanyonB, double pFlatA, double pFlatB, double pSymA, double pSymB, double pSymAs, double pSymBs, double pA, double pB) {
 
         double PAattr = ( ( canyon ? -log(pCanyonA)
                                 : -log(1 - pCanyonA) )
                         +
-                        (symetric ? -log(pSymA)
+                        (symetricWeak ? -log(pSymA)
                                 : -log(1 - pSymA) )
                         +
                         ( -log(pA) ) );
         double PAattrM = ( ( canyon ? (pCanyonA)
-                : (1 - pCanyonA) )
+                : (1.0 - pCanyonA) )
                 *
-                (symetric ? (pSymA)
-                        : (1 - pSymA) )
+                (symetricWeak ? (pSymA)
+                        : (1.0 - pSymA) )
                 *
-                ( (pA) ) );
+                (symetricStrong ? (pSymAs)
+                        : (1.0 - pSymAs) )
+                *
+                (flat ? (pFlatA)
+                        : (1.0 - pFlatA) )
+//                *
+//                ( (pA) )
+                );
 
         double PBattr = ( ( canyon ? -log(pCanyonB)
                         : -log(1 - pCanyonB) )
                         +
-                        (symetric ? -log(pSymB)
+                        (symetricWeak ? -log(pSymB)
                                 : -log(1 - pSymB) )
                         +
                         ( -log(pB) ) );
         double PBattrM = ( ( canyon ? (pCanyonB)
-                : (1 - pCanyonB) )
+                : (1.0 - pCanyonB) )
                 *
-                (symetric ? (pSymB)
-                        : (1 - pSymB) )
+                (symetricWeak ? (pSymB)
+                        : (1.0 - pSymB) )
                 *
-                ( (pB) ) );
+                (symetricStrong ? (pSymBs)
+                        : (1.0 - pSymBs) )
+                *
+                (flat ? (pFlatB)
+                        : (1.0 - pFlatB) )
+//                *
+//                ( (pB) )
+                );
 
         double Q = PAattr / PBattr;
         double QM = PAattrM / PBattrM;
 
         if (QM > 1) {
-            calculatedType = 'B';
-        } else {
             calculatedType = 'A';
+        } else {
+            calculatedType = 'B';
         }
     }
 

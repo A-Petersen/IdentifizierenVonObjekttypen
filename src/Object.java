@@ -26,7 +26,7 @@ public class Object {
     private boolean symetricWeak = false;
     private boolean symetricStrong = false;
     private boolean flat = false;
-    private int flatGradients = 0;
+//    private int flatGradients = 0;
     private boolean canyon = false;
     private double hight;
 
@@ -197,9 +197,9 @@ public class Object {
         System.out.println("x -> " + monotonicMatrix[0] + " | <- x " + monotonicMatrix[1] + " | <- y (up) " + monotonicMatrix[2] + " | y -> (down) " + monotonicMatrix[3]);
     }
 
-    public int getFlatGradients() {
-        return flatGradients;
-    }
+//    public int getFlatGradients() {
+//        return flatGradients;
+//    }
 
     private void flat() {
         //TODO: magicvalues
@@ -225,6 +225,7 @@ public class Object {
         int whatsFlat = (int)(0.01 * (getMax(matrixList).z - getMin(matrixList).z));
         int maxGradChange = 3;
         int counter = 0;
+        int watched = 0;
         //TODO: i = 1 !!!! direkte erste nachbarn nicht beachten.
         for (int i = 1; i < gradientsInXpos.size() - 1; i++) {
             if (gradientsInXpos.get(i + 1) / gradientsInXpos.get(i) > maxGradChange) break;
@@ -232,6 +233,7 @@ public class Object {
             {
                 counter++;
             }
+            watched++;
         }
         // <- x
         for (int i = 1; i < gradientsInXneg.size() -1; i++) {
@@ -240,6 +242,7 @@ public class Object {
             {
                 counter++;
             }
+            watched++;
         }
         // y ->
         for (int i = 1; i < gradientsInYpos.size() -1; i++) {
@@ -248,6 +251,7 @@ public class Object {
             {
                 counter++;
             }
+            watched++;
         }
         // <- y
         for (int i = 1; i < gradientsInYneg.size() -1; i++) {
@@ -256,10 +260,14 @@ public class Object {
             {
                 counter++;
             }
+            watched++;
         }
-        flatGradients = counter;
-        if (flatGradients > 15) flat = true;
-        System.out.println("FlatCounter[" + flatGradients + "]");
+
+
+
+//        flatGradients = counter;
+        if (counter / (double)watched > 0.4) flat = true;
+        System.out.println("Flat in %[" + counter / watched + "]");
     }
 
     private void symetric() {

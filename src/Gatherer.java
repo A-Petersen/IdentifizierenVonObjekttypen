@@ -69,7 +69,7 @@ public class Gatherer {
         double PCanyonA = canyonA / objectsA.size();
         double SymAw = symAw / objectsA.size();
         double SymAs = symAs / objectsA.size();
-        double VolA =  objectsA.stream().filter(x -> x.inHightRange > 0.55).count() / objectsA.size();
+        double VolA =  objectsA.stream().filter(x -> x.inHightRange > 0.55).count() / (double)objectsA.size();
         System.out.println("P(Volume|A) = " + VolA + "\nP(Flat|A) = " + PFlatA + "\nP(Canyon|A) = " + PCanyonA + "\nP(SymWeak|A) = " + SymAw + "\nP(SymStrong|A) = " + SymAs);
 
         double PMonoB = numIsMonotonicB / objectsB.size();
@@ -77,7 +77,7 @@ public class Gatherer {
         double PCanyonB = canyonB / objectsB.size();
         double SymBw = symBw / objectsB.size();
         double SymBs = symBs / objectsB.size();
-        double VolB =  objectsB.stream().filter(x -> x.inHightRange > 0.55).count() / objectsB.size();
+        double VolB =  objectsB.stream().filter(x -> x.inHightRange > 0.55).count() / (double)objectsB.size();
         System.out.println("P(Volume|B) = " + VolB + "\nP(Flat|B) = " + PFlatB + "\nP(Canyon|B) = " + PCanyonB + "\nP(SymWeak|B) = " + SymBw + "\nP(SymStrong|B) = " + SymBs);
 
         System.out.println(

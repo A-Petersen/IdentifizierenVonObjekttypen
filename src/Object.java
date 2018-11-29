@@ -1,15 +1,12 @@
 import org.jzy3d.maths.Coord3d;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static java.lang.Math.log;
+import static java.lang.Math.*;
 
 public class Object {
     private char type;
@@ -32,6 +29,8 @@ public class Object {
     private boolean canyon = false;
     private double hight;
 
+    public double inHightRange = 0;
+
     private int[] monotonicMatrix = {0,0,0,0};
 
     public double getMin() {
@@ -51,6 +50,7 @@ public class Object {
         symetric();
         fastSharp();
         minMax = maxGradientChange();
+        volume();
         hight = getMax(matrixList).z - getMin(matrixList).z;
         System.out.println("Gradient differences Max: [" + minMax[0] + "] \t Min: [" + minMax[1] + "]\nFlat: [" + flat + "]");
         calculateType(0.32821229050279327, 0.6127659574468085, 0.09078212290502793, 0.2425531914893617, 0.3784916201117318, 0.1276595744680851, 0.04888268156424581, 0.01702127659574468, 0.7528916929547844, 0.24710830704521555);
@@ -67,7 +67,6 @@ public class Object {
         position.z = maxZ.z;
         System.out.println("New Max Coord_pos: [" + position + "]");
         matrixList = Gatherer.getMatrix((int)position.x - size, (int)position.x + size, (int)position.y - size, (int)position.y + size);
-
         fillGradients();
         strictlyMonotonic();
 //        System.out.println("strictly monotonic: [" + sMonotonic + "]");
@@ -199,10 +198,6 @@ public class Object {
 
         System.out.println("Monoton direction until failure: [x -> " + monotonicMatrix[0] + " | <- x " + monotonicMatrix[1] + " | <- y (up) " + monotonicMatrix[2] + " | y -> (down) " + monotonicMatrix[3] + "]");
     }
-
-//    public int getFlatGradients() {
-//        return flatGradients;
-//    }
 
     private void flat() {
         //TODO: magicvalues
@@ -434,6 +429,70 @@ public class Object {
 
     public boolean calcRight() {
         return calculatedType == type;
+    }
+
+    public void volume() {
+        if (matrixList.size() < size*2 || matrixList.get(0).size() < size*2) return;
+
+        Coord3d point = getMax(matrixList);
+        int xPos = (int)point.x;
+        int yPos = (int)point.y;
+
+        // [x -> " + monotonicMatrix[0] + " | <- x " + monotonicMatrix[1] + " | <- y (up) " + monotonicMatrix[2] + " | y -> (down) " + monotonicMatrix[3]
+        int max = 0;
+        int maxIndex = 0;
+        for (int x = 0; x < 4; x++) {
+            if (monotonicMatrix[x] > max) {
+                max = monotonicMatrix[x] + 1;
+                maxIndex = x;
+            }
+        }
+
+        int zMinHigh = 0;
+//        switch (maxIndex) {
+//            case 0:
+////                zMinHigh = matrixList.get(xPos + max).get(yPos);
+//                double test0 = gradientsInXpos.subList(0, max).stream().reduce((x,y)-> x + y).get();
+//                zMinHigh = (int)(point.z + test0);
+//                break;
+//            case 1:
+////                zMinHigh = matrixList.get(xPos - max).get(yPos);
+//                double test1 = gradientsInXneg.subList(0, max).stream().reduce((x,y)-> x + y).get();
+//                zMinHigh = (int)(point.z + test1);
+//                break;
+//            case 2:
+////                zMinHigh = matrixList.get(xPos).get(yPos - max);
+//                double test2 = gradientsInYpos.subList(0, max).stream().reduce((x,y)-> x + y).get();
+//                zMinHigh = (int)(point.z + test2);
+//                break;
+//            case 3:
+////                zMinHigh = matrixList.get(xPos).get(yPos + max);
+//                double test3 = gradientsInYneg.subList(0, max).stream().reduce((x,y)-> x + y).get();
+//                zMinHigh = (int)(point.z + test3);
+//                break;
+//        }
+
+        double test0 = gradientsInXpos.subList(0, max).stream().reduce((x,y)-> x + y).get();
+        double test1 = gradientsInXneg.subList(0, max).stream().reduce((x,y)-> x + y).get();
+        double test2 = gradientsInYpos.subList(0, max).stream().reduce((x,y)-> x + y).get();
+        double test3 = gradientsInYneg.subList(0, max).stream().reduce((x,y)-> x + y).get();
+        zMinHigh = (int)(point.z + max(max(test0, test1), max(test2, test3)));
+
+        int amountPoints = 0;
+        int counter = 0;
+
+        for (int i = xPos - max; i < xPos + max; i++) {
+            for (int j = yPos - max; j < yPos + max; j++) {
+
+                if ( sqrt((xPos-i)*(xPos-i) + (yPos-j)*(yPos-j))  <  max) {
+                    amountPoints++;
+                    if (matrixList.get(i).get(j) > zMinHigh) counter++;
+
+                }
+            }
+        }
+        inHightRange = counter / (double)amountPoints;
+        System.out.println("Pseudo Volume: [" + inHightRange + "] by[" + zMinHigh + "]");
     }
 
     public double getHight() {

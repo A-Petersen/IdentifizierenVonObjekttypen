@@ -36,8 +36,8 @@ public class Gatherer {
     }
 
     private static int objectMatrixSize = 20;
-    public static int numRows_static = 3000;        // 4943
-    public static int numColumns_static = 3000;     // 3000
+    public static int numRows_static = 1500;        // 4943
+    public static int numColumns_static = 1500;     // 3000
 
     Gatherer(boolean xyz) throws IOException {
         xyValueA = getXYValues('A');
@@ -89,8 +89,8 @@ public class Gatherer {
                 + objectsB.stream().filter(x -> !x.calcRight()).count()
         );
 
-//        System.out.println("AvgHightA: " + objectsA.stream().mapToDouble(Object::getHight).average());
-//        System.out.println("AvgHightB: " + objectsB.stream().mapToDouble(Object::getHight).average());
+        System.out.println("AvgHightA: " + objectsA.stream().mapToDouble(x -> x.inHightRange).average());
+        System.out.println("AvgHightB: " + objectsB.stream().mapToDouble(x -> x.inHightRange).average());
 //
 //        System.out.println("AvgFGA: " + objectsA.stream().mapToDouble(Object::getFlatGradients).average());
 //        System.out.println("AvgFGB: " + objectsB.stream().mapToDouble(Object::getFlatGradients).average());

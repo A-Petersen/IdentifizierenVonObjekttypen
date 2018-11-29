@@ -444,7 +444,7 @@ public class Object {
         for (int x = 0; x < 4; x++) {
             if (monotonicMatrix[x] > max) {
                 max = monotonicMatrix[x] + 1;
-                maxIndex = x;
+                max = max > size - 1 ? size -1 : max;
             }
         }
 

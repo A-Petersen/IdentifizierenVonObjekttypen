@@ -36,8 +36,8 @@ public class Gatherer {
     }
 
     private static int objectMatrixSize = 20;
-    public static int numRows_static = 1500;        // 4943
-    public static int numColumns_static = 1500;     // 3000
+    public static int numRows_static = 3000;        // 4943
+    public static int numColumns_static = 3000;     // 3000
 
     Gatherer(boolean xyz) throws IOException {
         xyValueA = getXYValues('A');
@@ -69,14 +69,16 @@ public class Gatherer {
         double PCanyonA = canyonA / objectsA.size();
         double SymAw = symAw / objectsA.size();
         double SymAs = symAs / objectsA.size();
-        System.out.println("P(Mono|A) = " + PMonoA + "\nP(Flat|A) = " + PFlatA + "\nP(Canyon|A) = " + PCanyonA + "\nP(SymWeak|A) = " + SymAw + "\nP(SymStrong|A) = " + SymAs);
+        double VolA =  objectsA.stream().filter(x -> x.inHightRange > 0.55).count() / objectsA.size();
+        System.out.println("P(Volume|A) = " + VolA + "\nP(Flat|A) = " + PFlatA + "\nP(Canyon|A) = " + PCanyonA + "\nP(SymWeak|A) = " + SymAw + "\nP(SymStrong|A) = " + SymAs);
 
         double PMonoB = numIsMonotonicB / objectsB.size();
         double PFlatB = numFlatB / objectsB.size();
         double PCanyonB = canyonB / objectsB.size();
         double SymBw = symBw / objectsB.size();
         double SymBs = symBs / objectsB.size();
-        System.out.println("P(Mono|B) = " + PMonoB + "\nP(Flat|B) = " + PFlatB + "\nP(Canyon|B) = " + PCanyonB + "\nP(SymWeak|B) = " + SymBw + "\nP(SymStrong|B) = " + SymBs);
+        double VolB =  objectsB.stream().filter(x -> x.inHightRange > 0.55).count() / objectsB.size();
+        System.out.println("P(Volume|B) = " + VolB + "\nP(Flat|B) = " + PFlatB + "\nP(Canyon|B) = " + PCanyonB + "\nP(SymWeak|B) = " + SymBw + "\nP(SymStrong|B) = " + SymBs);
 
         System.out.println(
                 "\nA_right: "
@@ -89,8 +91,8 @@ public class Gatherer {
                 + objectsB.stream().filter(x -> !x.calcRight()).count()
         );
 
-        System.out.println("AvgHightA: " + objectsA.stream().mapToDouble(x -> x.inHightRange).average());
-        System.out.println("AvgHightB: " + objectsB.stream().mapToDouble(x -> x.inHightRange).average());
+        System.out.println("AvgHightA: " + objectsA.stream().filter(x -> x.inHightRange > 0.5).count());
+        System.out.println("AvgHightB: " + objectsB.stream().filter(x -> x.inHightRange > 0.5).count());
 //
 //        System.out.println("AvgFGA: " + objectsA.stream().mapToDouble(Object::getFlatGradients).average());
 //        System.out.println("AvgFGB: " + objectsB.stream().mapToDouble(Object::getFlatGradients).average());

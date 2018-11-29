@@ -29,7 +29,12 @@ public class Object {
     private boolean canyon = false;
     private double hight;
 
+    public boolean isPositivVolume() {
+        return positivVolume;
+    }
+
     public double inHightRange = 0;
+    private boolean positivVolume = false;
 
     private int[] monotonicMatrix = {0,0,0,0};
 
@@ -53,7 +58,7 @@ public class Object {
         volume();
         hight = getMax(matrixList).z - getMin(matrixList).z;
         System.out.println("Gradient differences Max: [" + minMax[0] + "] \t Min: [" + minMax[1] + "]\nFlat: [" + flat + "]");
-        calculateType(0.32821229050279327, 0.6127659574468085, 0.09078212290502793, 0.2425531914893617, 0.3784916201117318, 0.1276595744680851, 0.04888268156424581, 0.01702127659574468, 0.7528916929547844, 0.24710830704521555);
+        calculateType( 0.7765363128, 0.48085106382,0.32821229050279327, 0.6127659574468085, 0.09078212290502793, 0.2425531914893617, 0.3784916201117318, 0.1276595744680851, 0.04888268156424581, 0.01702127659574468, 0.7528916929547844, 0.24710830704521555);
         System.out.println("Correct Type: [" + calcRight() + "]" +
                 "\n------------------------------------------------------------------------------------------\n");
     }
@@ -371,7 +376,7 @@ public class Object {
         return symetricStrong;
     }
 
-    public void calculateType(double pCanyonA, double pCanyonB, double pFlatA, double pFlatB, double pSymA, double pSymB, double pSymAs, double pSymBs, double pA, double pB) {
+    public void calculateType(double pVolA, double pVolB, double pCanyonA, double pCanyonB, double pFlatA, double pFlatB, double pSymA, double pSymB, double pSymAs, double pSymBs, double pA, double pB) {
 
         double PAattr = ( ( canyon ? -log(pCanyonA)
                                 : -log(1 - pCanyonA) )
@@ -391,6 +396,9 @@ public class Object {
                 *
                 (flat ? (pFlatA)
                         : (1.0 - pFlatA) )
+//                *
+//                (positivVolume ? (pVolA)
+//                        : (1.0 - pVolA) )
 //                *
 //                ( (pA) )
                 );
@@ -413,6 +421,9 @@ public class Object {
                 *
                 (flat ? (pFlatB)
                         : (1.0 - pFlatB) )
+//                *
+//                (positivVolume ? (pVolB)
+//                        : (1.0 - pVolB) )
 //                *
 //                ( (pB) )
                 );
@@ -492,6 +503,7 @@ public class Object {
             }
         }
         inHightRange = counter / (double)amountPoints;
+        positivVolume = inHightRange > 0.5;
         System.out.println("Pseudo Volume: [" + inHightRange + "] by[" + zMinHigh + "]");
     }
 

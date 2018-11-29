@@ -36,7 +36,7 @@ public class Gatherer {
     }
 
     private static int objectMatrixSize = 20;
-    public static int numRows_static = 3000;        // 4943
+    public static int numRows_static = 4943;        // 4943
     public static int numColumns_static = 3000;     // 3000
 
     Gatherer(boolean xyz) throws IOException {

@@ -4,7 +4,7 @@ public class main {
     public static void main(String[] args) throws Exception {
 //        AnalysisLauncher.open(new Test(new View(7, 20, 'A'), true));
 //        AnalysisLauncher.open(new Test(new View(14, 20, 'A'), true));
-        AnalysisLauncher.open(new Test(new View(64, 20, 'A'), true));
+        AnalysisLauncher.open(new Test(new View(299, 20, 'A'), true));
 //        AnalysisLauncher.open(new Test(new View(77, 20, 'A'), true));
 //        AnalysisLauncher.open(new Test(new View(33, 8, 'A'), true));
 //        AnalysisLauncher.open(new Test(new View(64, 8, 'A'), true));

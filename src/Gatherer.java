@@ -13,8 +13,6 @@ public class Gatherer {
         Gatherer g = new Gatherer(getObjects);
     }
 
-    // Koordinaten (Spalte,Zeile)
-
     private Map<Integer, List<Integer>> xyValueA = new LinkedHashMap<>();
     private Map<Integer, List<Integer>> xyValueB = new LinkedHashMap<>();
     private List<Integer> zValueA = new LinkedList<>();
@@ -29,9 +27,9 @@ public class Gatherer {
     public static int numColumns_static = 500;     // 3000
 
     Gatherer(boolean createObjects) throws IOException {
-        xyValueA = getXYValues('A');
-        xyValueB = getXYValues('B');
-        getZValues();
+        xyValueA = getXYValues("Data/A0.csv");
+        xyValueB = getXYValues("Data/B0.csv");
+        getZValues("Data/data.csv");
         coordsA = getCoords('A', numRows_static,numColumns_static,1,1, createObjects);
         coordsB = getCoords('B', numRows_static,numColumns_static,1,1, createObjects);
 
@@ -39,9 +37,9 @@ public class Gatherer {
     }
 
     Gatherer() throws IOException {
-        xyValueA = getXYValues('A');
-        xyValueB = getXYValues('B');
-        getZValues();
+        xyValueA = getXYValues("Data/A0.csv");
+        xyValueB = getXYValues("Data/B0.csv");
+        getZValues("Data/data.csv");
     }
 
     public void printAttributes() {
@@ -85,15 +83,25 @@ public class Gatherer {
         );
     }
 
-    private LinkedHashMap getXYValues(char object) throws IOException {
-        Reader data = new FileReader("Data/" + object + "0.csv");
+    /**
+     * Creates a Map [Map<Integer, List<Integer>>] with the given X-Y pairs by the CSV-File.
+     * CSV-File need the following format:
+     * Column, row\nColumn, row\n...
+     * Example data:
+     * 2,3\n2,4\n3,1\n
+     * creates -> {2={3,4},3={1}}
+     * @param dataPath  Path of the CSV-File
+     * @return Map<Integer, List<Integer>> with X<List<Y>>
+     * @throws IOException
+     */
+    private LinkedHashMap getXYValues(String dataPath) throws IOException {
+        Reader data = new FileReader(dataPath);
         Iterable<CSVRecord> rows = CSVFormat.EXCEL.parse(data);
         Map<Integer, List<Integer>> unsorted = new HashMap<>();
         Map<Integer, List<Integer>> sorted = new LinkedHashMap<>();
         for (CSVRecord row : rows) {
             Integer rowValue = Integer.parseInt(row.get(1));
             Integer columnValue = Integer.parseInt(row.get(0));
-            if (object == 'A' || object == 'B') {
                 if (!unsorted.containsKey(rowValue)) {
                     List<Integer> list = new LinkedList<>();
                     list.add(columnValue);
@@ -101,23 +109,24 @@ public class Gatherer {
                 } else {
                     unsorted.get(rowValue).add(columnValue);
                 }
-
-            } else {
-                System.err.println("Methode mit fehlerhaften Parametern genutzt!");
-            }
         }
         unsorted.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByKey())
                 .forEachOrdered(x -> sorted.put(x.getKey(), x.getValue()));
-        System.out.println(object + " - " + sorted.size());
-        System.out.println(sorted.values().stream().mapToInt(List::size).sum());
         return (LinkedHashMap) sorted;
     }
 
-    private void getZValues() throws IOException {
+    /**
+     * Fills the Gatherer lists [List<Integer> zValueA] and [List<Integer> zValueB] with their desired values
+     * given the CSV-File.
+     * Needs the X-Y coordinates out of [Map<Integer, List<Integer>> xyValueA] and [Map<Integer, List<Integer>> xyValueB]
+     * @param dataPath  Path of the CSV-File
+     * @throws IOException
+     */
+    private void getZValues(String dataPath) throws IOException {
         int count = 1;
-        Reader data = new FileReader("Data/data.csv");
+        Reader data = new FileReader(dataPath);
         Iterable<CSVRecord> rows = CSVFormat.EXCEL.parse(data);
 
         for (CSVRecord row : rows) {
@@ -132,7 +141,8 @@ public class Gatherer {
     }
 
     /**
-     *
+     * Creates a List of coordinates in a specific field of the X-Y-Z matrix. Only X and Y can be parameterized.
+     * Merges the data of [Map<Integer, List<Integer>> xyValue] and [List<Integer> zValue] to create the coordinates.
      * @param type      Type of the object as char ('A' or 'B')
      * @param xStart    Startpoint in X
      * @param xSize     Size of X
@@ -147,7 +157,7 @@ public class Gatherer {
         List<Coord3d> list = new LinkedList<>();
         List<Integer> object = new LinkedList<>();
         Map<Integer, List<Integer>> map = new LinkedHashMap<>();
-        if (type == 'A') {
+        if (type == 'A') {  // Decides which lists (A or B) are necessary for further computation.
             map = xyValueA;
             object = zValueA;
         } else {
@@ -155,18 +165,20 @@ public class Gatherer {
             object = zValueB;
         }
 
-        for (Map.Entry<Integer, List<Integer>> entry : map.entrySet()) {
-            if (entry.getKey() <= xSize &&
+        for (Map.Entry<Integer, List<Integer>> entry : map.entrySet()) {    // Iterate X
+            if (entry.getKey() <= xSize &&              // Check if X has to be considered.
                 entry.getKey() >= xStart)
             {
-                for (Integer y : entry.getValue()) {
-                    if( y >= yStart &&
+                for (Integer y : entry.getValue()) {    // Iterate Y in current X
+                    if( y >= yStart &&                  // Check if Y has to be considered.
                             y <= ySize) {
                         Coord3d coord = new Coord3d(entry.getKey() - xStart, y - yStart, object.get(count));
                         list.add(coord);
+
                         System.out.println("\n------------------------------------------------------------------------------------------\n"
                                 + type + ": " + entry.getKey() + "-" + y + "-" + object.get(count) + " Index[" + (list.size() - 1) + "]");
-                        if (type == 'A' && createObjects) {
+
+                        if (type == 'A' && createObjects) { // Create the object lists.
                             objectsA.add(new Object(coord, objectMatrixSize, 'A'));
                         } else if (createObjects) {
                             objectsB.add(new Object(coord, objectMatrixSize, 'B'));
@@ -206,11 +218,11 @@ public class Gatherer {
         Iterable<CSVRecord> rows = CSVFormat.EXCEL.parse(data);
         for (CSVRecord row : rows) {                                   // Iterates through the CSV-File row by row (does not read the whole file into memory)
             List<Integer> dataListInner = new LinkedList<>();
-            for (int i = yStart -1; i < yStop; i++) {                 // Iterates through X (rows) and Y (row) checks if the coordinate has to be considered.
+            for (int i = yStart -1; i < yStop; i++) {                  // Iterates through Y (row) checks if the Y coordinate has to be considered.
                 //TODO: ??? war ohne -1, 41 | 40  (41|41 hat das ergebnis leicht verschlechtert, warum?)
                 if (count >= xStart) dataListInner.add(Integer.parseInt(row.get(i).replace(".", "")));
             }
-            if (count >= xStart) dataList.add(dataListInner);
+            if (count >= xStart) dataList.add(dataListInner);          // Checks if X has to be considered, if then add the list.
             if (count == xStop) break;
             count++;
         }

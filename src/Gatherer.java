@@ -2,6 +2,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.jzy3d.maths.Coord3d;
 
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -22,8 +23,11 @@ public class Gatherer {
     private List<Object> objectsB = new LinkedList<>();
 
     private static int objectMatrixSize = 20;
-    public static int numRows_static = 3000;        // 4943
-    public static int numColumns_static = 3000;     // 3000
+    public static int numRows_static = 500;        // 4943
+    public static int numColumns_static = 500;     // 3000
+
+    private int dataXsize = 0;
+    private int dataYsize = 0;
 
     public AttributeValues attributeValues;
 
@@ -36,6 +40,8 @@ public class Gatherer {
         xyValueA = getXYValues("Data/A0.csv");
         xyValueB = getXYValues("Data/B0.csv");
         getZValues("Data/data.csv");
+        getDataSize("Data/data.csv");
+        System.out.println("DataSize[" + dataXsize + " x " + dataYsize + "]");
         coordsA = getCoords('A', numRows_static,numColumns_static,1,1, createObjects);
         coordsB = getCoords('B', numRows_static,numColumns_static,1,1, createObjects);
 
@@ -55,6 +61,20 @@ public class Gatherer {
         xyValueA = getXYValues("Data/A0.csv");
         xyValueB = getXYValues("Data/B0.csv");
         getZValues("Data/data.csv");
+    }
+
+    /**
+     * Acquires the Size (X-Y) of the CSV-File.
+     * @param dataPath  Path of the CSV-File
+     * @throws IOException
+     */
+    private void getDataSize(String dataPath) throws IOException {
+        Reader data = new FileReader(dataPath);
+        Iterable<CSVRecord> rows = CSVFormat.EXCEL.parse(data);
+        for (CSVRecord row : rows) {
+            if (dataXsize == 1) dataYsize = row.size();
+            dataXsize++;
+        }
     }
 
     /**

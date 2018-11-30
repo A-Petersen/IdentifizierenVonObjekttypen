@@ -10,7 +10,7 @@ import java.util.*;
 
 public class Gatherer {
     public static void main(String[] args) throws Exception {
-        Gatherer g = new Gatherer(true);
+
     }
 
     private Map<Integer, List<Integer>> xyValueA = new LinkedHashMap<>();
@@ -36,21 +36,14 @@ public class Gatherer {
      * @param createObjects True - create objects, False - do not create objects
      * @throws IOException
      */
-    Gatherer(boolean createObjects) throws IOException {
-        xyValueA = getXYValues("Data/A0.csv");
-        xyValueB = getXYValues("Data/B0.csv");
-        getZValues("Data/data.csv");
-        getDataSize("Data/data.csv");
+    Gatherer(boolean createObjects, String aCoordsData, String bCoordsData, String dataPath) throws IOException {
+        xyValueA = getXYValues(aCoordsData);
+        xyValueB = getXYValues(bCoordsData);
+        getZValues(dataPath);
+        getDataSize(dataPath);
         System.out.println("DataSize[" + dataXsize + " x " + dataYsize + "]");
         coordsA = getCoords('A', numRows_static,numColumns_static,1,1, createObjects);
         coordsB = getCoords('B', numRows_static,numColumns_static,1,1, createObjects);
-
-        createAttributes();
-        attributeValues.printAttrValues();
-        calculateObjects(attributeValues);
-        calculateObjects(new AttributeValues(979, 405, 0.7073699421965318, 0.29263005780346824,
-                0.09397344228804903, 0.2839632277834525, 0.4198161389172625, 0.056179775280898875, 0.0,
-                0.2691358024691358, 0.5456790123456791, 0.15555555555555556, 0.019753086419753086, 0.0));
     }
 
     /**

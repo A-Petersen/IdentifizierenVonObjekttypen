@@ -13,43 +13,29 @@ public class Object {
     private char calculatedType;
     private Coord3d position;
     private int size;
-    List<List<Integer>> matrixList = new LinkedList<>();
-    List<Double> gradientsInXpos = new LinkedList<>();
-    List<Double> gradientsInXneg = new LinkedList<>();
-    List<Double> gradientsInYneg = new LinkedList<>();
-    List<Double> gradientsInYpos = new LinkedList<>();
+    private List<List<Integer>> matrixList = new LinkedList<>();
+    private List<Double> gradientsInXpos = new LinkedList<>();
+    private List<Double> gradientsInXneg = new LinkedList<>();
+    private List<Double> gradientsInYneg = new LinkedList<>();
+    private List<Double> gradientsInYpos = new LinkedList<>();
     private double[] minMax;
-    private boolean sMonotonic = true;
     private List<Double> symetricInX = new LinkedList<>();
     private List<Double> symetricInY = new LinkedList<>();
     private boolean symetricWeak = false;
     private boolean symetricStrong = false;
     private boolean flat = false;
-//    private int flatGradients = 0;
     private boolean canyon = false;
     private double hight;
-
-    public boolean isPositivVolume() {
-        return positivVolume;
-    }
-
-    public double inHightRange = 0;
+    private double inHightRange;
     private boolean positivVolume = false;
 
     private int[] monotonicMatrix = {0,0,0,0};
-
-    public double getMin() {
-        return minMax[1];
-    }
-
-    public double getMax() {
-        return minMax[0];
-    }
 
     public Object(Coord3d position, int ab, char type) throws IOException {
         this.type = type;
         this.position = position;
         this.size = ab;
+        this.inHightRange = 0;
         gatherGradients();
         flat();
         symetric();
@@ -65,16 +51,15 @@ public class Object {
 
     public void gatherGradients() throws IOException {
 
-        matrixList = Gatherer.getMatrix((int)position.x - size, (int)position.x + size, (int)position.y - size, (int)position.y + size);
+        matrixList = Gatherer.getMatrix((int)position.x - size, (int)position.x + size, (int)position.y - size, (int)position.y + size, "Data/data.csv");
         Coord3d maxZ = getMax(matrixList);
         position.x = position.x - (matrixList.size()/2) + maxZ.x;
         position.y = position.y - (matrixList.get(0).size()/2) + maxZ.y;
         position.z = maxZ.z;
         System.out.println("New Max Coord_pos: [" + position + "]");
-        matrixList = Gatherer.getMatrix((int)position.x - size, (int)position.x + size, (int)position.y - size, (int)position.y + size);
+        matrixList = Gatherer.getMatrix((int)position.x - size, (int)position.x + size, (int)position.y - size, (int)position.y + size, "Data/data.csv");
         fillGradients();
         strictlyMonotonic();
-//        System.out.println("strictly monotonic: [" + sMonotonic + "]");
     }
 
     private void fillGradients() {
@@ -103,7 +88,6 @@ public class Object {
         Collections.reverse(gradientsInYpos);
         gradientsInYpos = gradientsInYpos.stream().map(x -> x * -1 ).collect(Collectors.toList());
         gradientsInYneg.addAll(dummy.subList((int)getMax(matrixList).x , dummy.size()));
-//        gradientsInYneg = gradientsInYneg.stream().map(x -> x < 0 ? x * -1 : x).collect(Collectors.toList());
         System.out.println("Gradienten in Y -> (down): \t" + gradientsInYneg);
         System.out.println("Gradienten in <- Y (up): \t" + gradientsInYpos);
 
@@ -111,12 +95,8 @@ public class Object {
 
     private double getGradient(List<List<Integer>> mList, Point a, char direction) {
         if (direction == 'x') {
-//            System.out.println("Z zZ.:" + matrixList.get(a.x).get(a.y));
-//            System.out.println(mList.get(a.x + 1).get(a.y) + ") - (" + mList.get(a.x).get(a.y));
             return (mList.get(a.x + 1).get(a.y) - mList.get(a.x).get(a.y));
         }
-//        System.out.println("Z zZ.:" + matrixList.get(a.x).get(a.y));
-//        System.out.println("(" + mList.get(a.x).get(a.y + 1) + ") - (" + mList.get(a.x).get(a.y) + ") = " + (mList.get(a.x).get(a.y + 1) - mList.get(a.x).get(a.y)));
         return (mList.get(a.x).get(a.y + 1) - mList.get(a.x).get(a.y));
     }
 
@@ -165,39 +145,25 @@ public class Object {
 
     private void strictlyMonotonic() {
         // TODO: muss eigentlich i = 0 und  -2 zwei sein !!! schränkt im moment den kreis für monoton ein. 1.25 streng monoton gilt auch für 25% nicht monoton
-//        for (int i = 1; i < values.size() -3; i++) {
-////            if ((i < size - 2) && values.get(i) * 1.25 < values.get(i+1))
-////                sMonotonic = false;
-////            if ((i >= size) && values.get(i) * 0.75 < values.get(i+1))
-////                sMonotonic = false;
-//            if ((i < size - 2) && values.get(i) > values.get(i+1)) break;
-//            if ((i < size - 2) && values.get(i) * 0.75 < values.get(i+1)) sMonotonic = false;
-//            if ((i >= size) && values.get(i) > values.get(i+1)) break;
-//            if ((i >= size) && values.get(i) * 1.25 < values.get(i+1)) sMonotonic = false;
-//        }
 
         // x ->
         for (int i = 0; i < gradientsInXpos.size() -1; i++) {
             if (gradientsInXpos.get(i) < gradientsInXpos.get(i+1)) break;
-//            if (gradientsInXpos.get(i) * 1.2 < gradientsInXpos.get(i+1)) sMonotonic = false;
             monotonicMatrix[0]++;
         }
         // <- x
         for (int i = 0; i < gradientsInXneg.size() -1; i++) {
             if (gradientsInXneg.get(i) < gradientsInXneg.get(i + 1)) break;
-//            if (gradientsInXneg.get(i) * 1.2 < gradientsInXneg.get(i + 1)) sMonotonic = false;
             monotonicMatrix[1]++;
         }
         // y ->
         for (int i = 0; i < gradientsInYpos.size() -1; i++) {
             if (gradientsInYpos.get(i) < gradientsInYpos.get(i + 1)) break;
-//            if (gradientsInYpos.get(i) * 1.2 < gradientsInYpos.get(i + 1)) sMonotonic = false;
             monotonicMatrix[2]++;
         }
         // <- y
         for (int i = 0; i < gradientsInYneg.size() -1; i++) {
             if (gradientsInYneg.get(i) < gradientsInYneg.get(i + 1)) break;
-//            if (gradientsInYneg.get(i) * 1.2 < gradientsInYneg.get(i + 1)) sMonotonic = false;
             monotonicMatrix[3]++;
         }
 
@@ -206,68 +172,12 @@ public class Object {
 
     private void flat() {
         //TODO: magicvalues
-//        int whatsFlat = (int)(0.02 * (getMax(matrixList).z - getMin(matrixList).z));
-//        if (gradientsInXpos.size() < 4
-//            ||gradientsInXneg.size() < 4
-//            ||gradientsInYneg.size() < 4
-//            ||gradientsInYpos.size() < 4) return;
-//        if (
-//                // x ->
-//                (((gradientsInXpos.get(3) + gradientsInXpos.get(2) + gradientsInXpos.get(1) ) * -1 < whatsFlat)
-//                ||  // <- x
-//                ((gradientsInXneg.get(3) + gradientsInXneg.get(2) + gradientsInXneg.get(1) ) * -1 < whatsFlat))
-//            ||
-//                // <- y
-//                (((gradientsInYneg.get(3) + gradientsInYneg.get(2) + gradientsInYneg.get(1) ) * -1 < whatsFlat)
-//                ||  // y ->
-//                ((gradientsInYpos.get(3) + gradientsInYpos.get(2) + gradientsInYpos.get(1) ) * -1 < whatsFlat)))
-//        {
-//            flat = true;
-//        }
-        // x ->
         int whatsFlat = (int)(0.01 * (getMax(matrixList).z - getMin(matrixList).z));
         int maxGradChange = 3;
-//        int counter = 0;
-//        int watched = 0;
         double erg = 0;
         AtomicInteger counterA = new AtomicInteger(0);
         AtomicInteger watchedA = new AtomicInteger(0);
         //TODO: i = 1 !!!! direkte erste nachbarn nicht beachten.
-//        for (int i = 1; i < gradientsInXpos.size() - 1; i++) {
-//            if (gradientsInXpos.get(i + 1) / gradientsInXpos.get(i) > maxGradChange) break;
-//            if (gradientsInXpos.get(i) *-1 < whatsFlat)
-//            {
-//                counter++;
-//            }
-//            watched++;
-//        }
-//        // <- x
-//        for (int i = 1; i < gradientsInXneg.size() -1; i++) {
-//            if (gradientsInXneg.get(i + 1) / gradientsInXneg.get(i) > maxGradChange) break;
-//            if (gradientsInXneg.get(i) *-1 < whatsFlat)
-//            {
-//                counter++;
-//            }
-//            watched++;
-//        }
-//        // y ->
-//        for (int i = 1; i < gradientsInYpos.size() -1; i++) {
-//            if (gradientsInYpos.get(i + 1) / gradientsInYpos.get(i) > maxGradChange) break;
-//            if (gradientsInYpos.get(i) *-1 < whatsFlat)
-//            {
-//                counter++;
-//            }
-//            watched++;
-//        }
-//        // <- y
-//        for (int i = 1; i < gradientsInYneg.size() -1; i++) {
-//            if (gradientsInYneg.get(i + 1) / gradientsInYneg.get(i) > maxGradChange) break;
-//            if (gradientsInYneg.get(i) *-1 < whatsFlat)
-//            {
-//                counter++;
-//            }
-//            watched++;
-//        }
 
         Consumer<List<Double>> iterateGradients = (x) -> {
             for (int i = 1; i < x.size() -1; i++) {
@@ -335,7 +245,6 @@ public class Object {
             y = 0;
             x++;
         }
-//        System.out.println("New Max Coord: " + max);
         return max;
     }
 
@@ -356,24 +265,7 @@ public class Object {
             y = 0;
             x++;
         }
-//        System.out.println("New Max Coord: " + max);
         return min;
-    }
-
-    public boolean issMonotonic() {
-        return sMonotonic;
-    }
-
-    public boolean isFlat() {
-        return flat;
-    }
-
-    public boolean isWeakSymetric() {
-        return symetricWeak;
-    }
-
-    public boolean isStrongSymetric() {
-        return symetricStrong;
     }
 
     public void calculateType(double pVolA, double pVolB, double pCanyonA, double pCanyonB, double pFlatA, double pFlatB, double pSymA, double pSymB, double pSymAs, double pSymBs, double pA, double pB) {
@@ -438,10 +330,6 @@ public class Object {
         }
     }
 
-    public boolean calcRight() {
-        return calculatedType == type;
-    }
-
     public void volume() {
         if (matrixList.size() < size*2 || matrixList.get(0).size() < size*2) return;
 
@@ -451,7 +339,6 @@ public class Object {
 
         // [x -> " + monotonicMatrix[0] + " | <- x " + monotonicMatrix[1] + " | <- y (up) " + monotonicMatrix[2] + " | y -> (down) " + monotonicMatrix[3]
         int max = 0;
-        int maxIndex = 0;
         for (int x = 0; x < 4; x++) {
             if (monotonicMatrix[x] > max) {
                 max = monotonicMatrix[x] + 1;
@@ -459,30 +346,7 @@ public class Object {
             }
         }
 
-        int zMinHigh = 0;
-//        switch (maxIndex) {
-//            case 0:
-////                zMinHigh = matrixList.get(xPos + max).get(yPos);
-//                double test0 = gradientsInXpos.subList(0, max).stream().reduce((x,y)-> x + y).get();
-//                zMinHigh = (int)(point.z + test0);
-//                break;
-//            case 1:
-////                zMinHigh = matrixList.get(xPos - max).get(yPos);
-//                double test1 = gradientsInXneg.subList(0, max).stream().reduce((x,y)-> x + y).get();
-//                zMinHigh = (int)(point.z + test1);
-//                break;
-//            case 2:
-////                zMinHigh = matrixList.get(xPos).get(yPos - max);
-//                double test2 = gradientsInYpos.subList(0, max).stream().reduce((x,y)-> x + y).get();
-//                zMinHigh = (int)(point.z + test2);
-//                break;
-//            case 3:
-////                zMinHigh = matrixList.get(xPos).get(yPos + max);
-//                double test3 = gradientsInYneg.subList(0, max).stream().reduce((x,y)-> x + y).get();
-//                zMinHigh = (int)(point.z + test3);
-//                break;
-//        }
-
+        int zMinHigh;
         double test0 = gradientsInXpos.subList(0, max).stream().reduce((x,y)-> x + y).get();
         double test1 = gradientsInXneg.subList(0, max).stream().reduce((x,y)-> x + y).get();
         double test2 = gradientsInYpos.subList(0, max).stream().reduce((x,y)-> x + y).get();
@@ -507,31 +371,35 @@ public class Object {
         System.out.println("Pseudo Volume: [" + inHightRange + "] by[" + zMinHigh + "]");
     }
 
-    public double getHight() {
-        return hight;
+    public boolean calcRight() {
+        return calculatedType == type;
     }
 
-    private void normalize() {
-        // MIT INTEGER NICHT I.O.
-        int row = 0;
-        int column = 0;
-        int normValue = 10000;
-        int minZ = (int)getMin(matrixList).z;
-        double maxZ = getMax(matrixList).z - minZ;
-        for (List<Integer> list : matrixList) {
-            for (int z : list) {
-//                System.out.println("TEstXY "+ (z - minZ) + " / " + maxZ + " = " + (z - minZ)/maxZ);
-                list.set(column, (int)(((z - minZ)/maxZ) * normValue));
-                column++;
-            }
-            column = 0;
-            row++;
-        }
-//        matrixList.stream().forEach(x -> x.stream().forEach(y-> System.out.println(y)));
-        //Gradienten in X: (incl. negativ)[1204.0, 901.0, 602.0, 336.0, 127.0, -93.0, -563.0, -1099.0, -1738.0, -2179.0]
+    public boolean isPositivVolume() {
+        return positivVolume;
     }
 
-    public Coord3d getPosition() {
-        return position;
+    public double getMin() {
+        return minMax[1];
+    }
+
+    public double getMax() {
+        return minMax[0];
+    }
+
+    public boolean isFlat() {
+        return flat;
+    }
+
+    public boolean isWeakSymetric() {
+        return symetricWeak;
+    }
+
+    public boolean isStrongSymetric() {
+        return symetricStrong;
+    }
+
+    public double getInHightRange() {
+        return inHightRange;
     }
 }

@@ -10,23 +10,27 @@ public class View {
     private int yStart;
     private Coord3d coord;
     private char type;
+    private boolean landscape;
     private Gatherer points = new Gatherer();
 
     View (int xSize, int xStart, int ySize, int yStart) throws IOException {
-        this.xSize = xSize;
-        this.xStart = xStart;
-        this.ySize = ySize;
-        this.yStart = yStart;
+        this.landscape = true;
+        this.xSize = Gatherer.secureOutOfBound(xSize,1, 4943);
+        this.xStart = Gatherer.secureOutOfBound(xStart,1, 4943);
+        this.ySize = Gatherer.secureOutOfBound(ySize,1, 3000);
+        this.yStart = Gatherer.secureOutOfBound(yStart,1, 3000);
+        System.out.println(this.xSize + "-" + this.xStart + "-" + this.ySize + "-" + this.yStart);
     }
 
     View (int index, int martixSize, char type) throws IOException {
+        this.landscape = false;
         List<Coord3d> coords = points.getCoords(type == 'A' ? 'A' : 'B', Gatherer.numRows_static, Gatherer.numColumns_static, 1, 1, false);
-        coord = coords.get(index);
+        this.coord = coords.get(index);
         this.type = type;
-        xSize = Gatherer.secureOutOfBound((int)coord.x + martixSize,1, 4943);
-        xStart = Gatherer.secureOutOfBound((int)coord.x - martixSize,1, 4943);
-        ySize = Gatherer.secureOutOfBound((int)coord.y + martixSize,1, 3000);
-        yStart = Gatherer.secureOutOfBound((int)coord.y - martixSize,1, 3000);
+        this.xSize = Gatherer.secureOutOfBound((int)coord.x + martixSize,1, 4943);
+        this.xStart = Gatherer.secureOutOfBound((int)coord.x - martixSize,1, 4943);
+        this.ySize = Gatherer.secureOutOfBound((int)coord.y + martixSize,1, 3000);
+        this.yStart = Gatherer.secureOutOfBound((int)coord.y - martixSize,1, 3000);
         System.out.println(xSize + "-" + xStart + "-" + yStart + "-" + ySize);
     }
 
@@ -54,9 +58,7 @@ public class View {
         return type;
     }
 
-    //    private int secureOutOfBound(int x, int min, int max) {
-//        int res = x < min ? min : x;
-//        res = res > max ? max : res;
-//        return res;
-//    }
+    public boolean isLandscape() {
+        return landscape;
+    }
 }

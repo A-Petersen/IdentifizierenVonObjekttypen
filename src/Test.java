@@ -1,5 +1,3 @@
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVRecord;
 import org.jzy3d.analysis.AbstractAnalysis;
 import org.jzy3d.chart.factories.AWTChartComponentFactory;
 import org.jzy3d.colors.Color;
@@ -11,11 +9,8 @@ import org.jzy3d.plot3d.primitives.Polygon;
 import org.jzy3d.plot3d.primitives.Shape;
 import org.jzy3d.plot3d.rendering.canvas.Quality;
 
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class Test extends AbstractAnalysis {
@@ -27,24 +22,32 @@ public class Test extends AbstractAnalysis {
     private int ySize;
     private int yStart;
     private boolean grid;
+    private View view;
+    private List<Coord3d> coordsA;
+    private List<Coord3d> coordsB;
 
-    Test (View view, boolean grid) {
-        xSize = view.getxSize();
-        xStart = view.getxStart();
-        ySize = view.getySize();
-        yStart = view.getyStart();
-        type = view.getType();
-        coord = view.getCoord();
+    Test (View view, boolean grid) throws IOException {
+        this.view = view;
+        this.xSize = view.getxSize();
+        this.xStart = view.getxStart();
+        this.ySize = view.getySize();
+        this.yStart = view.getyStart();
+        this.type = view.getType();
+        if (!view.isLandscape()) {
+            coord = view.getCoord();
+        } else {
+            Gatherer points = new Gatherer();
+            coordsA = points.getCoords('A', xSize, ySize, xStart, yStart, false);
+            coordsB = points.getCoords('B', xSize, ySize, xStart, yStart, false);
+        }
         this.grid = grid;
+        System.out.println("T0: " + this.xSize + "-" + this.xStart + "-" + this.yStart + "-" + this.ySize);
     }
+
     @Override
     public void init() throws IOException {
-
-//        Gatherer points = new Gatherer();
-//        List<Coord3d> coordsA = points.getCoords('A', xSize, ySize, xStart, yStart, false);
-//        List<Coord3d> coordsB = points.getCoords('B', xSize, ySize, xStart, yStart, false);
-
-        List<List<Integer>> data = Gatherer.getMatrix(xStart, xSize, yStart, ySize);
+        System.out.println("T1: " + this.xSize + "-" + this.xStart + "-" + this.yStart + "-" + this.ySize);
+        List<List<Integer>> data = Gatherer.getMatrix(xStart, xSize, yStart, ySize, "Data/data.csv");
 
         // Build a polygon list
         List<Polygon> polygons = new ArrayList<>();
@@ -72,60 +75,16 @@ public class Test extends AbstractAnalysis {
         chart.getAxeLayout().setYAxeLabel( "y-test" );
         chart.getAxeLayout().setZAxeLabel( "z-test" );
 
-        if (type == 'A') {
-            System.out.println(coord);
+        if (type == 'A' && !view.isLandscape()) {
             chart.addDrawable(new Point(coord, Color.RED, 20));
-        }else{
-            System.out.println(coord);
+        }else if (!view.isLandscape()) {
             chart.addDrawable(new Point(coord, Color.GREEN, 20));
         }
 
-//        coordsB.forEach(x -> System.out.println(x));
-//        coordsA.forEach(x  -> chart.addDrawable(new Point(new Coord3d(x.x-1, x.y-1, x.z), Color.RED, 20)));
-//        coordsB.forEach(x  -> chart.addDrawable(new Point(new Coord3d(x.x-1, x.y-1, x.z), Color.GREEN, 20)));
-//        coordsB.forEach(x-> System.out.println(x));
-//        Point abc = new Point(new Coord3d(100.0,100.0,100.0), Color.RED, 5);
-//        chart.addDrawable(abc);
+        if (view.isLandscape()) {
+            coordsA.stream().forEach(x -> chart.addDrawable(new Point(new Coord3d(x.x, x.y, x.z + 10000.0), Color.RED, 10)));
+            coordsB.stream().forEach(x -> chart.addDrawable(new Point(new Coord3d(x.x, x.y, x.z + 10000.0), Color.GREEN, 10)));
+        }
 
-//        // Define a function to plot
-//        Mapper mapper = new Mapper() {
-//            @Override
-//            public double f(double x, double y) {
-//                return x * Math.sin(x * y);
-//            }
-//        };
-//
-//        // Define range and precision for the function to plot
-//        Range range = new Range(-3, 3);
-//        int steps = 80;
-//
-//        // Create the object to represent the function over the given range.
-//        final Shape surface = Builder.buildOrthonormal(new OrthonormalGrid(range, steps, range, steps), mapper);
-//        surface.setColorMapper(new ColorMapper(new ColorMapRainbow(), surface.getBounds().getZmin(), surface.getBounds().getZmax(), new Color(1, 1, 1, .5f)));
-//        surface.setFaceDisplayed(true);
-//        surface.setWireframeDisplayed(false);
-//
-//        // Create a chart
-//        chart = AWTChartComponentFactory.chart(Quality.Advanced, getCanvasType());
-//        chart.getScene().getGraph().add(surface);
     }
-
-//    public List<List<Integer>> getMatrix() throws IOException {
-//        int count = 0;
-//        List<List<Integer>> dataList = new LinkedList<>();
-//
-//        Reader data = new FileReader("Data/data.csv");
-//        Iterable<CSVRecord> rows = CSVFormat.EXCEL.parse(data);
-//        for (CSVRecord row : rows) {
-//            List<Integer> dataListInner = new LinkedList<>();
-//            for (int i = yStart; i < ySize; i++) {
-//                if (count >= xStart) dataListInner.add(Integer.parseInt(row.get(i).replace(".", "")));
-//            }
-//            if (count >= xStart) dataList.add(dataListInner);
-//            if (count == xSize - 1) break;
-//            count++;
-//        }
-//        System.out.println(dataList.size() + " | " + dataList.get(0).size());
-//        return dataList;
-//    }
 }

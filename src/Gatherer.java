@@ -42,6 +42,10 @@ public class Gatherer {
 
         createAttributes();
         attributeValues.printAttrValues();
+        calculateObjects(attributeValues);
+        calculateObjects(new AttributeValues(979, 405, 0.7073699421965318, 0.29263005780346824,
+                0.09397344228804903, 0.2839632277834525, 0.4198161389172625, 0.056179775280898875, 0.0,
+                0.2691358024691358, 0.5456790123456791, 0.15555555555555556, 0.019753086419753086, 0.0));
     }
 
     /**
@@ -90,14 +94,18 @@ public class Gatherer {
                 PFlatA, PCanyonA, PSymAw, PSymAs, PVolA,
                 PFlatB, PCanyonB, PSymBw, PSymBs, PVolB
         );
+    }
 
+    public void calculateObjects(AttributeValues attributeValues) {
+        objectsA.stream().forEach(x -> x.calculateType(attributeValues));
+        objectsB.stream().forEach(x -> x.calculateType(attributeValues));
         System.out.println(
                 "\nA_right: "
                         + objectsA.stream().filter(x -> x.calcRight()).count()
-                        + " \tB_right: "
-                        + objectsB.stream().filter(x -> x.calcRight()).count() + " TP[" + (objectsB.stream().filter(x -> x.calcRight()).count() / (double)objectsB.size()) + "]"
                         + " \tA_false: "
                         + objectsA.stream().filter(x -> !x.calcRight()).count() + " FP[" + (objectsA.stream().filter(x -> !x.calcRight()).count() / (double)objectsA.size()) + "]"
+                        + " \nB_right: "
+                        + objectsB.stream().filter(x -> x.calcRight()).count() + " TP[" + (objectsB.stream().filter(x -> x.calcRight()).count() / (double)objectsB.size()) + "]"
                         + " \tB_false: "
                         + objectsB.stream().filter(x -> !x.calcRight()).count()
         );

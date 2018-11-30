@@ -42,4 +42,52 @@ public class AttributeValues {
         System.out.println("P(Volume|A) = " + PVolA + "\nP(Flat|A) = " + PFlatA + "\nP(Canyon|A) = " + PCanyonA + "\nP(SymWeak|A) = " + PSymAw + "\nP(SymStrong|A) = " + PSymAs);
         System.out.println("P(Volume|B) = " + PVolB + "\nP(Flat|B) = " + PFlatB + "\nP(Canyon|B) = " + PCanyonB + "\nP(SymWeak|B) = " + PSymBw + "\nP(SymStrong|B) = " + PSymBs);
     }
+
+    public double getPA() {
+        return PA;
+    }
+
+    public double getPB() {
+        return PB;
+    }
+
+    public double getPFlatA() {
+        return PFlatA;
+    }
+
+    public double getPCanyonA() {
+        return PCanyonA;
+    }
+
+    public double getPSymAw() {
+        return PSymAw;
+    }
+
+    public double getPSymAs() {
+        return PSymAs;
+    }
+
+    public double getPVolA() {
+        return PVolA;
+    }
+
+    public double getPFlatB() {
+        return PFlatB;
+    }
+
+    public double getPCanyonB() {
+        return PCanyonB;
+    }
+
+    public double getPSymBw() {
+        return PSymBw;
+    }
+
+    public double getPSymBs() {
+        return PSymBs;
+    }
+
+    public double getPVolB() {
+        return PVolB;
+    }
 }

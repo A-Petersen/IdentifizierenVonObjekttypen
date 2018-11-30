@@ -44,7 +44,7 @@ public class Object {
         volume();
         hight = getMax(matrixList).z - getMin(matrixList).z;
         System.out.println("Gradient differences Max: [" + minMax[0] + "] \t Min: [" + minMax[1] + "]\nFlat: [" + flat + "]");
-        calculateType( 0.7765363128, 0.48085106382,0.32821229050279327, 0.6127659574468085, 0.09078212290502793, 0.2425531914893617, 0.3784916201117318, 0.1276595744680851, 0.04888268156424581, 0.01702127659574468, 0.7528916929547844, 0.24710830704521555);
+//        calculateType( 0.7765363128, 0.48085106382,0.32821229050279327, 0.6127659574468085, 0.09078212290502793, 0.2425531914893617, 0.3784916201117318, 0.1276595744680851, 0.04888268156424581, 0.01702127659574468, 0.7528916929547844, 0.24710830704521555);
         System.out.println("Correct Type: [" + calcRight() + "]" +
                 "\n------------------------------------------------------------------------------------------\n");
     }
@@ -268,62 +268,74 @@ public class Object {
         return min;
     }
 
-    public void calculateType(double pVolA, double pVolB, double pCanyonA, double pCanyonB, double pFlatA, double pFlatB, double pSymA, double pSymB, double pSymAs, double pSymBs, double pA, double pB) {
+    public void calculateType(AttributeValues aV) {
 
-        double PAattr = ( ( canyon ? -log(pCanyonA)
-                                : -log(1 - pCanyonA) )
+        double PAattr = ( ( canyon ? log(aV.getPCanyonA())
+                                : log(1 - aV.getPCanyonA()) )
                         +
-                        (symetricWeak ? -log(pSymA)
-                                : -log(1 - pSymA) )
+                        (symetricWeak ? log(aV.getPSymAw())
+                                : log(1 - aV.getPSymAw()) )
                         +
-                        ( -log(pA) ) );
-        double PAattrM = ( ( canyon ? (pCanyonA)
-                : (1.0 - pCanyonA) )
-                *
-                (symetricWeak ? (pSymA)
-                        : (1.0 - pSymA) )
-                *
-                (symetricStrong ? (pSymAs)
-                        : (1.0 - pSymAs) )
-                *
-                (flat ? (pFlatA)
-                        : (1.0 - pFlatA) )
+                        (symetricStrong ? log(aV.getPSymAs())
+                                : log(1 - aV.getPSymAs()) )
+                        +
+                        (flat ? log(aV.getPFlatA())
+                                : log(1 - aV.getPFlatA()) )
+                        );
+
+//        double PAattrM = ( ( canyon ? (pCanyonA)
+//                : (1.0 - pCanyonA) )
+//                *
+//                (symetricWeak ? (pSymA)
+//                        : (1.0 - pSymA) )
+//                *
+//                (symetricStrong ? (pSymAs)
+//                        : (1.0 - pSymAs) )
+//                *
+//                (flat ? (pFlatA)
+//                        : (1.0 - pFlatA) )
 //                *
 //                (positivVolume ? (pVolA)
 //                        : (1.0 - pVolA) )
 //                *
 //                ( (pA) )
-                );
+//                );
 
-        double PBattr = ( ( canyon ? -log(pCanyonB)
-                        : -log(1 - pCanyonB) )
-                        +
-                        (symetricWeak ? -log(pSymB)
-                                : -log(1 - pSymB) )
-                        +
-                        ( -log(pB) ) );
-        double PBattrM = ( ( canyon ? (pCanyonB)
-                : (1.0 - pCanyonB) )
-                *
-                (symetricWeak ? (pSymB)
-                        : (1.0 - pSymB) )
-                *
-                (symetricStrong ? (pSymBs)
-                        : (1.0 - pSymBs) )
-                *
-                (flat ? (pFlatB)
-                        : (1.0 - pFlatB) )
+        double PBattr = ( ( canyon ? log(aV.getPCanyonB())
+                : log(1 - aV.getPCanyonB()) )
+                +
+                (symetricWeak ? log(aV.getPSymBw())
+                        : log(1 - aV.getPSymBw()) )
+                +
+                (symetricStrong ? log(aV.getPSymBs())
+                        : log(1 - aV.getPSymBs()) )
+                +
+                (flat ? log(aV.getPFlatB())
+                        : log(1 - aV.getPFlatB()) )
+        );
+
+//        double PBattrM = ( ( canyon ? (pCanyonB)
+//                : (1.0 - pCanyonB) )
+//                *
+//                (symetricWeak ? (pSymB)
+//                        : (1.0 - pSymB) )
+//                *
+//                (symetricStrong ? (pSymBs)
+//                        : (1.0 - pSymBs) )
+//                *
+//                (flat ? (pFlatB)
+//                        : (1.0 - pFlatB) )
 //                *
 //                (positivVolume ? (pVolB)
 //                        : (1.0 - pVolB) )
 //                *
 //                ( (pB) )
-                );
+//                );
 
         double Q = PAattr / PBattr;
-        double QM = PAattrM / PBattrM;
+//        double QM = PAattrM / PBattrM;
 
-        if (QM > 1) {
+        if (PAattr > PBattr) {
             calculatedType = 'A';
         } else {
             calculatedType = 'B';

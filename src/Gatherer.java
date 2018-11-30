@@ -9,8 +9,7 @@ import java.util.*;
 
 public class Gatherer {
     public static void main(String[] args) throws Exception {
-        boolean getObjects = true;
-        Gatherer g = new Gatherer(getObjects);
+        Gatherer g = new Gatherer(true);
     }
 
     private Map<Integer, List<Integer>> xyValueA = new LinkedHashMap<>();
@@ -96,6 +95,11 @@ public class Gatherer {
         );
     }
 
+    /**
+     * Calculates the estimated types of the A and B objects of the Gatherer and prints the result.
+     * Needs the class AttributeValues to calculate each object.
+     * @param attributeValues   AttributeValues for calculations
+     */
     public void calculateObjects(AttributeValues attributeValues) {
         objectsA.stream().forEach(x -> x.calculateType(attributeValues));
         objectsB.stream().forEach(x -> x.calculateType(attributeValues));
@@ -174,14 +178,14 @@ public class Gatherer {
      * Merges the data of [Map<Integer, List<Integer>> xyValue] and [List<Integer> zValue] to create the coordinates.
      * @param type      Type of the object as char ('A' or 'B')
      * @param xStart    Startpoint in X
-     * @param xSize     Size of X
+     * @param xStop     Endpoint of X
      * @param yStart    Startpoint in Y
-     * @param ySize     Size of Y
+     * @param yStop     Endpoint of Y
      * @param createObjects    Should the object list be filled ? (True/False) High run-time!
      * @return  List<Coord3d> the list of the parameterized coordinates
      * @throws IOException
      */
-    public List<Coord3d> getCoords(char type, int xSize, int ySize, int xStart, int yStart, boolean createObjects) throws IOException {
+    public List<Coord3d> getCoords(char type, int xStop, int yStop, int xStart, int yStart, boolean createObjects) throws IOException {
         int count = 0;
         List<Coord3d> list = new LinkedList<>();
         List<Integer> object = new LinkedList<>();
@@ -195,12 +199,12 @@ public class Gatherer {
         }
 
         for (Map.Entry<Integer, List<Integer>> entry : map.entrySet()) {    // Iterate X
-            if (entry.getKey() <= xSize &&              // Check if X has to be considered.
+            if (entry.getKey() <= xStop &&              // Check if X has to be considered.
                 entry.getKey() >= xStart)
             {
                 for (Integer y : entry.getValue()) {    // Iterate Y in current X
                     if( y >= yStart &&                  // Check if Y has to be considered.
-                            y <= ySize) {
+                            y <= yStop) {
                         Coord3d coord = new Coord3d(entry.getKey() - xStart, y - yStart, object.get(count));
                         list.add(coord);
 
@@ -235,9 +239,9 @@ public class Gatherer {
      * Builds a X-Y-Z matrix out of an CSV-File within the given field.
      * Does only support a matrix of 4943 by 3000 without failure. These parameters can be changed inside the method.
      * @param xStart    Startpoint in X
-     * @param xStop     Size of X
+     * @param xStop     Endpoint of X
      * @param yStart    Startpoint in Y
-     * @param yStop     Size of Y
+     * @param yStop     Endpoint of Y
      * @param dataPath  Path of the CSV-File
      * @return  List<List<Integer>> where X<Y<Z>>
      * @throws IOException

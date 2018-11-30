@@ -23,9 +23,16 @@ public class Gatherer {
     private List<Object> objectsB = new LinkedList<>();
 
     private static int objectMatrixSize = 20;
-    public static int numRows_static = 500;        // 4943
-    public static int numColumns_static = 500;     // 3000
+    public static int numRows_static = 3000;        // 4943
+    public static int numColumns_static = 3000;     // 3000
 
+    public AttributeValues attributeValues;
+
+    /**
+     * Constructor to create and analyse the given objects.
+     * @param createObjects True - create objects, False - do not create objects
+     * @throws IOException
+     */
     Gatherer(boolean createObjects) throws IOException {
         xyValueA = getXYValues("Data/A0.csv");
         xyValueB = getXYValues("Data/B0.csv");
@@ -33,16 +40,26 @@ public class Gatherer {
         coordsA = getCoords('A', numRows_static,numColumns_static,1,1, createObjects);
         coordsB = getCoords('B', numRows_static,numColumns_static,1,1, createObjects);
 
-        printAttributes();
+        createAttributes();
+        attributeValues.printAttrValues();
     }
 
+    /**
+     * Constructor to build a View without creating and analysing the objects.
+     * @throws IOException
+     */
     Gatherer() throws IOException {
         xyValueA = getXYValues("Data/A0.csv");
         xyValueB = getXYValues("Data/B0.csv");
         getZValues("Data/data.csv");
     }
 
-    public void printAttributes() {
+    /**
+     * Prints the attribute values and the amount of True/False-Positives given by the Gatherer.
+     * Only if A and B objects were created.
+     */
+    public void createAttributes() {
+        if (objectsA.isEmpty() || objectsB.isEmpty()) return;
         double canyonA = objectsA.stream().filter(x -> x.getMax() > 6.0).count();
         double numFlatA = objectsA.stream().filter(Object::isFlat).count();
         double symAw = objectsA.stream().filter(Object::isWeakSymetric).count();
@@ -55,21 +72,24 @@ public class Gatherer {
 
         double PA = objectsA.size() / (double)(objectsA.size() + objectsB.size());
         double PB = objectsB.size() / (double)(objectsA.size() + objectsB.size());
-        System.out.println("\n\nP(A) = " + PA + "\tP(B) = " + PB + "\t of " + (objectsA.size() + objectsB.size()) + " Objects [A=" + objectsA.size() + "] B[" + objectsB.size() + "]");
 
         double PFlatA = numFlatA / objectsA.size();
         double PCanyonA = canyonA / objectsA.size();
-        double SymAw = symAw / objectsA.size();
-        double SymAs = symAs / objectsA.size();
-        double VolA =  objectsA.stream().filter(x -> x.getInHightRange() > 0.55).count() / (double)objectsA.size();
-        System.out.println("P(Volume|A) = " + VolA + "\nP(Flat|A) = " + PFlatA + "\nP(Canyon|A) = " + PCanyonA + "\nP(SymWeak|A) = " + SymAw + "\nP(SymStrong|A) = " + SymAs);
+        double PSymAw = symAw / objectsA.size();
+        double PSymAs = symAs / objectsA.size();
+        double PVolA =  objectsA.stream().filter(x -> x.getInHightRange() > 0.55).count() / (double)objectsA.size();
 
         double PFlatB = numFlatB / objectsB.size();
         double PCanyonB = canyonB / objectsB.size();
-        double SymBw = symBw / objectsB.size();
-        double SymBs = symBs / objectsB.size();
-        double VolB =  objectsB.stream().filter(x -> x.getInHightRange() > 0.55).count() / (double)objectsB.size();
-        System.out.println("P(Volume|B) = " + VolB + "\nP(Flat|B) = " + PFlatB + "\nP(Canyon|B) = " + PCanyonB + "\nP(SymWeak|B) = " + SymBw + "\nP(SymStrong|B) = " + SymBs);
+        double PSymBw = symBw / objectsB.size();
+        double PSymBs = symBs / objectsB.size();
+        double PVolB =  objectsB.stream().filter(x -> x.getInHightRange() > 0.55).count() / (double)objectsB.size();
+
+        attributeValues = new AttributeValues(
+                objectsA.size(), objectsB.size(), PA, PB,
+                PFlatA, PCanyonA, PSymAw, PSymAs, PVolA,
+                PFlatB, PCanyonB, PSymBw, PSymBs, PVolB
+        );
 
         System.out.println(
                 "\nA_right: "
@@ -88,7 +108,7 @@ public class Gatherer {
      * CSV-File need the following format:
      * Column, row\nColumn, row\n...
      * Example data:
-     * 2,3\n2,4\n3,1\n
+     * 3,2\n4,2\n1,3\n
      * creates -> {2={3,4},3={1}}
      * @param dataPath  Path of the CSV-File
      * @return Map<Integer, List<Integer>> with X<List<Y>>
@@ -99,17 +119,18 @@ public class Gatherer {
         Iterable<CSVRecord> rows = CSVFormat.EXCEL.parse(data);
         Map<Integer, List<Integer>> unsorted = new HashMap<>();
         Map<Integer, List<Integer>> sorted = new LinkedHashMap<>();
-        for (CSVRecord row : rows) {
+        for (CSVRecord row : rows) {    // Iterates through the CSV-File row by row (does not read the whole file into memory)
             Integer rowValue = Integer.parseInt(row.get(1));
             Integer columnValue = Integer.parseInt(row.get(0));
-                if (!unsorted.containsKey(rowValue)) {
+                if (!unsorted.containsKey(rowValue)) {  // If X-Value is not already considered create a new list for Y-Values and add it.
                     List<Integer> list = new LinkedList<>();
                     list.add(columnValue);
                     unsorted.put(rowValue, list);
-                } else {
+                } else {    // Add the Y-Value to the desired X-Value
                     unsorted.get(rowValue).add(columnValue);
                 }
         }
+        // Sort the created map by the X-Values.
         unsorted.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByKey())
@@ -192,6 +213,14 @@ public class Gatherer {
 
         }
         return list;
+    }
+
+    /**
+     * Get thr trained attribute values out of the Gatherer.
+     * @return Class - AttributeValues
+     */
+    public AttributeValues getAttributeValues() {
+        return attributeValues;
     }
 
     /**

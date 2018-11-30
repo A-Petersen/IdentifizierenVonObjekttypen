@@ -17,9 +17,9 @@ public class Test extends AbstractAnalysis {
 
     private Coord3d coord;
     private char type;
-    private int xSize;
+    private int xStop;
     private int xStart;
-    private int ySize;
+    private int yStop;
     private int yStart;
     private boolean grid;
     private View view;
@@ -28,26 +28,26 @@ public class Test extends AbstractAnalysis {
 
     Test (View view, boolean grid) throws IOException {
         this.view = view;
-        this.xSize = view.getxSize();
+        this.xStop = view.getxStop();
         this.xStart = view.getxStart();
-        this.ySize = view.getySize();
+        this.yStop = view.getyStop();
         this.yStart = view.getyStart();
         this.type = view.getType();
         if (!view.isLandscape()) {
             coord = view.getCoord();
         } else {
             Gatherer points = new Gatherer();
-            coordsA = points.getCoords('A', xSize, ySize, xStart, yStart, false);
-            coordsB = points.getCoords('B', xSize, ySize, xStart, yStart, false);
+            coordsA = points.getCoords('A', xStop, yStop, xStart, yStart, false);
+            coordsB = points.getCoords('B', xStop, yStop, xStart, yStart, false);
         }
         this.grid = grid;
-        System.out.println("T0: " + this.xSize + "-" + this.xStart + "-" + this.yStart + "-" + this.ySize);
+        System.out.println("T1: " + this.xStart + "-" + this.xStop + "-" + this.yStart + "-" + this.yStop);
     }
 
     @Override
     public void init() throws IOException {
-        System.out.println("T1: " + this.xSize + "-" + this.xStart + "-" + this.yStart + "-" + this.ySize);
-        List<List<Integer>> data = Gatherer.getMatrix(xStart, xSize, yStart, ySize, "Data/data.csv");
+        System.out.println("T1: " + this.xStart + "-" + this.xStop + "-" + this.yStart + "-" + this.yStop);
+        List<List<Integer>> data = Gatherer.getMatrix(xStart, xStop, yStart, yStop, "Data/data.csv");
 
         // Build a polygon list
         List<Polygon> polygons = new ArrayList<>();

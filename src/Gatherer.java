@@ -25,8 +25,8 @@ public class Gatherer {
     private List<Object> objectsB = new LinkedList<>();
 
     private static int objectMatrixSize = 20;
-    public static int numRows_static = 3000;        // 4943
-    public static int numColumns_static = 3000;     // 3000
+    public static int numRows_static = 500;        // 4943
+    public static int numColumns_static = 500;     // 3000
 
     Gatherer(boolean createObjects) throws IOException {
         xyValueA = getXYValues('A');
@@ -131,6 +131,17 @@ public class Gatherer {
         }
     }
 
+    /**
+     *
+     * @param type      Type of the object as char ('A' or 'B')
+     * @param xStart    Startpoint in X
+     * @param xSize     Size of X
+     * @param yStart    Startpoint in Y
+     * @param ySize     Size of Y
+     * @param createObjects    Should the object list be filled ? (True/False) High run-time!
+     * @return  List<Coord3d> the list of the parameterized coordinates
+     * @throws IOException
+     */
     public List<Coord3d> getCoords(char type, int xSize, int ySize, int xStart, int yStart, boolean createObjects) throws IOException {
         int count = 0;
         List<Coord3d> list = new LinkedList<>();
@@ -164,9 +175,7 @@ public class Gatherer {
                     count++;
                 }
             } else {    // If coordinate is not in our desired matrix, count the necessary steps.
-                for (Integer i : entry.getValue()) {
-                    count++;
-                }
+                count = count + entry.getValue().size();
             }
 
         }
@@ -177,37 +186,45 @@ public class Gatherer {
      * Builds a X-Y-Z matrix out of an CSV-File within the given field.
      * Does only support a matrix of 4943 by 3000 without failure. These parameters can be changed inside the method.
      * @param xStart    Startpoint in X
-     * @param xSize     Size of X
+     * @param xStop     Size of X
      * @param yStart    Startpoint in Y
-     * @param ySize     Size of Y
+     * @param yStop     Size of Y
+     * @param dataPath  Path of the CSV-File
      * @return  List<List<Integer>> where X<Y<Z>>
      * @throws IOException
      */
-    public static List<List<Integer>> getMatrix(int xStart, int xSize, int yStart, int ySize, String dataPath) throws IOException {
+    public static List<List<Integer>> getMatrix(int xStart, int xStop, int yStart, int yStop, String dataPath) throws IOException {
         // Secure parameters to be correct, if they are incorrect, correct them.
-        xSize = secureOutOfBound(xSize, 1, 4943);
+        xStop = secureOutOfBound(xStop, 1, 4943);
         xStart = secureOutOfBound(xStart, 1, 4943);
-        ySize = secureOutOfBound(ySize, 1, 3000);
+        yStop = secureOutOfBound(yStop, 1, 3000);
         yStart = secureOutOfBound(yStart, 1, 3000);
 
         int count = 0;
         List<List<Integer>> dataList = new LinkedList<>();             // Represents the matrix. (X-Y-Z)
-        Reader data = new FileReader(dataPath);              // Main .csv data origin.
+        Reader data = new FileReader(dataPath);                        // Main .csv data origin.
         Iterable<CSVRecord> rows = CSVFormat.EXCEL.parse(data);
         for (CSVRecord row : rows) {                                   // Iterates through the CSV-File row by row (does not read the whole file into memory)
             List<Integer> dataListInner = new LinkedList<>();
-            for (int i = yStart - 1; i < ySize; i++) {                 // Iterates through X (rows) and Y (row) checks if the coordinate has to be considered.
+            for (int i = yStart -1; i < yStop; i++) {                 // Iterates through X (rows) and Y (row) checks if the coordinate has to be considered.
                 //TODO: ??? war ohne -1, 41 | 40  (41|41 hat das ergebnis leicht verschlechtert, warum?)
                 if (count >= xStart) dataListInner.add(Integer.parseInt(row.get(i).replace(".", "")));
             }
             if (count >= xStart) dataList.add(dataListInner);
-            if (count == xSize) break;
+            if (count == xStop) break;
             count++;
         }
         System.out.println("MatrixSize X-Y: [" + dataList.size() + " | " + dataList.get(0).size() + "]");
         return dataList;
     }
 
+    /**
+     * Secures an out of bound case.
+     * @param x     Number to be secured
+     * @param min   Minimum number to be returned
+     * @param max   Maximum number to be returned
+     * @return  Number
+     */
     public static int secureOutOfBound(int x, int min, int max) {
         int res = x < min ? min : x;
         res = res > max ? max : res;

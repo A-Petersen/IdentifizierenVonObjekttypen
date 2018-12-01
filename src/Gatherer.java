@@ -7,24 +7,66 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.*;
 
+/**
+ * Class Gatherer. Gathers the object data.
+ */
 public class Gatherer {
 
-    private Map<Integer, List<Integer>> xyValueA = new LinkedHashMap<>();
-    private Map<Integer, List<Integer>> xyValueB = new LinkedHashMap<>();
+    /**
+     * Describes the P(X|Y) points of A objects.
+     * Map<Integer, List<Integer>> with X<List<Y>>
+     */
+    private Map<Integer, List<Integer>> xyValueA;
+    /**
+     * Describes the P(X|Y) points of B objects.
+     * Map<Integer, List<Integer>> with X<List<Y>>
+     */
+    private Map<Integer, List<Integer>> xyValueB;
+    /**
+     * List of all Z-Values of A objects.
+     * Index matches with [Map<Integer, List<Integer>> xyValueA]
+     */
     private List<Integer> zValueA = new LinkedList<>();
+    /**
+     * List of all Z-Values of B objects.
+     * Index matches with [Map<Integer, List<Integer>> xyValueB]
+     */
     private List<Integer> zValueB = new LinkedList<>();
+    /**
+     * Coordinates of all A objects.
+     */
     private List<Coord3d> coordsA = new LinkedList<>();
+    /**
+     * Coordinates of all B objects.
+     */
     private List<Coord3d> coordsB = new LinkedList<>();
+    /**
+     * List of all A objects.
+     */
     private List<Object> objectsA = new LinkedList<>();
+    /**
+     * List of all B objects.
+     */
     private List<Object> objectsB = new LinkedList<>();
-
+    /**
+     * Describes the size each matrix for the objects.
+     */
     private int objectMatrixSize = 20;
-
+    /**
+     * Number of Rows in the given data.
+     */
     private int dataXsize = 0;
+    /**
+     * Number of Columns in the given data.
+     */
     private int dataYsize = 0;
-
+    /**
+     * Console editions desired.
+     */
     private boolean verbose;
-
+    /**
+     * AttributeValues Class
+     */
     private AttributeValues attributeValues;
 
     /**
@@ -128,13 +170,13 @@ public class Gatherer {
         double PCanyonA = canyonA / objectsA.size();
         double PSymAw = symAw / objectsA.size();
         double PSymAs = symAs / objectsA.size();
-        double PVolA =  objectsA.stream().filter(x -> x.getInHeightRange() > 0.55).count() / (double)objectsA.size();
+        double PVolA =  objectsA.stream().filter(x -> x.getPseudoVolume() > 0.55).count() / (double)objectsA.size();
 
         double PFlatB = numFlatB / objectsB.size();
         double PCanyonB = canyonB / objectsB.size();
         double PSymBw = symBw / objectsB.size();
         double PSymBs = symBs / objectsB.size();
-        double PVolB =  objectsB.stream().filter(x -> x.getInHeightRange() > 0.55).count() / (double)objectsB.size();
+        double PVolB =  objectsB.stream().filter(x -> x.getPseudoVolume() > 0.55).count() / (double)objectsB.size();
 
         attributeValues = new AttributeValues(
                 objectsA.size(), objectsB.size(), PA, PB,

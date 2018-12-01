@@ -13,20 +13,60 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Test extends AbstractAnalysis {
+/**
+ * DrawView uses the library Jzy3d to visualize the objects or a specified landscape
+ * of the given CSV-File.
+ */
+public class DrawView extends AbstractAnalysis {
 
+    /**
+     * Desired point to build a View
+     */
     private Coord3d coord;
+    /**
+     * Object type A or B
+     */
     private char type;
+    /**
+     * Endpoint of X
+     */
     private int xStop;
+    /**
+     * Startpoint in X
+     */
     private int xStart;
+    /**
+     * Endpoint of Y
+     */
     private int yStop;
+    /**
+     * Startpoint in Y
+     */
     private int yStart;
+    /**
+     * View has a grid
+     */
     private boolean grid;
+    /**
+     * View Class
+     */
     private View view;
+    /**
+     * List of coordinates of A objects
+     */
     private List<Coord3d> coordsA;
+    /**
+     * List of coordinates of B objects
+     */
     private List<Coord3d> coordsB;
 
-    Test (View view, boolean grid) throws IOException {
+    /**
+     * Constructor for DrawView. Needed to parameterize the polygonView.
+     * @param view  Class View
+     * @param grid  Should the View draw a grid ?
+     * @throws IOException
+     */
+    DrawView(View view, boolean grid) throws IOException {
         this.view = view;
         this.xStop = view.getxStop();
         this.xStart = view.getxStart();
@@ -41,13 +81,15 @@ public class Test extends AbstractAnalysis {
             coordsB = gatherer.getCoords('B', xStop, yStop, xStart, yStart, false);
         }
         this.grid = grid;
-        System.out.println("T1: " + this.xStart + "-" + this.xStop + "-" + this.yStart + "-" + this.yStop);
     }
 
+    /**
+     * Build the [List<Polygon> polygons] and creates the 3d object.
+     * @throws IOException
+     */
     @Override
     public void init() throws IOException {
-        System.out.println("T1: " + this.xStart + "-" + this.xStop + "-" + this.yStart + "-" + this.yStop);
-        List<List<Integer>> data = Gatherer.getMatrix(xStart, xStop, yStart, yStop, "Data/data.csv");
+        List<List<Integer>> data = Gatherer.getMatrix(xStart, xStop, yStart, yStop, view.getDataPath());
 
         // Build a polygon list
         List<Polygon> polygons = new ArrayList<>();
@@ -62,7 +104,7 @@ public class Test extends AbstractAnalysis {
             }
         }
 
-        // Creates the 3d object
+        // Creates the 3d object [Build from examples of jzy3d]
         final Shape surface = new Shape(polygons);
         surface.setColorMapper(new ColorMapper(new ColorMapRainbow(), surface.getBounds().getZmin(), surface.getBounds().getZmax(), new org.jzy3d.colors.Color(1,1,1,1f)));
         surface.setWireframeDisplayed(grid);
@@ -71,9 +113,9 @@ public class Test extends AbstractAnalysis {
         chart = AWTChartComponentFactory.chart(Quality.Advanced, getCanvasType());
         chart.getScene().getGraph().add(surface);
 
-        chart.getAxeLayout().setXAxeLabel( "x-test" );
-        chart.getAxeLayout().setYAxeLabel( "y-test" );
-        chart.getAxeLayout().setZAxeLabel( "z-test" );
+        chart.getAxeLayout().setXAxeLabel( "X" );
+        chart.getAxeLayout().setYAxeLabel( "Y" );
+        chart.getAxeLayout().setZAxeLabel( "Z" );
 
         if (type == 'A' && !view.isLandscape()) {
             chart.addDrawable(new Point(coord, Color.RED, 20));

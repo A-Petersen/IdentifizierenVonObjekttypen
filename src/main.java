@@ -8,9 +8,9 @@ public class main {
         String b1 = "Data/B1.csv";
         String data = "Data/data.csv";
 
-        AnalysisLauncher.open(new Test(new View(0, 20, 'A', a0, b0, data), true));
-        AnalysisLauncher.open(new Test(new View(0, 20, 'B', a0, b0, data), true));
-        AnalysisLauncher.open(new Test(new View(400, 580, 200, 380, a0, b0, data), false));
+        AnalysisLauncher.open(new DrawView(new View(0, 20, 'A', a0, b0, data), true));
+        AnalysisLauncher.open(new DrawView(new View(0, 20, 'B', a0, b0, data), true));
+        AnalysisLauncher.open(new DrawView(new View(400, 580, 200, 380, a0, b0, data), false));
 
 
         AttributeValues maxByMax = new AttributeValues(979, 405, 0.7073699421965318, 0.29263005780346824,

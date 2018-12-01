@@ -1,3 +1,6 @@
+/**
+ * Class Point. Helper class to move a point through a given matrix.
+ */
 public class Point {
     public int x;
     public int y;

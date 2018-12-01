@@ -8,28 +8,94 @@ import java.util.stream.Collectors;
 
 import static java.lang.Math.*;
 
+/**
+ * Object Class represents A and B objects.
+ */
 public class Object {
+    /**
+     * Original human set type.
+     */
     private char type;
+    /**
+     * Calculated type in assistance of AttributeValues.
+     */
     private char calculatedType;
+    /**
+     * Centre position of the object.
+     */
     private Coord3d position;
+    /**
+     * Number of points from [Coord3d position] to the edge of the matrix.
+     */
     private int size;
+    /**
+     * X-Y-Z Matrix of the object.
+     */
     private List<List<Integer>> matrixList = new LinkedList<>();
+    /**
+     * P(mid X | mid Y) to P(max X | mid Y)
+     * List of gradients from [Coord3d position] to the edge of the matrix.
+     */
     private List<Double> gradientsInXpos = new LinkedList<>();
+    /**
+     * P(mid X | mid Y) to P(min X | mid Y)
+     * List of gradients from [Coord3d position] to the edge of the matrix.
+     */
     private List<Double> gradientsInXneg = new LinkedList<>();
+    /**
+     * P(mid X | mid Y) to P(mid X | min Y)
+     * List of gradients from [Coord3d position] to the edge of the matrix.
+     */
     private List<Double> gradientsInYneg = new LinkedList<>();
+    /**
+     * P(mid X | mid Y) to P(mid X | max Y)
+     * List of gradients from [Coord3d position] to the edge of the matrix.
+     */
     private List<Double> gradientsInYpos = new LinkedList<>();
+    /**
+     * Maximum and minimum Z-Value of the matrix.
+     */
     private double[] minMax;
+    /**
+     * Number of symmetric points in X.
+     */
     private List<Double> symmetricInX = new LinkedList<>();
+    /**
+     * Number of symmetric points in Y.
+     */
     private List<Double> symmetricInY = new LinkedList<>();
+    /**
+     * Object is Weak symmetric. Symmetric in X or Y.
+     */
     private boolean symmetricWeak = false;
+    /**
+     * Object is Strong symmetric. Symmetric in X and Y.
+     */
     private boolean symmetricStrong = false;
+    /**
+     * Object is Flat
+     */
     private boolean flat = false;
+    /**
+     * Object contains a canyon.
+     */
     private boolean canyon = false;
+    /**
+     * Object height.
+     */
     private double height;
-    private double inHeightRange;
-    private boolean positiveVolume = false;
+    /**
+     * Object pseudo volume is healthy.
+     */
+    private double pseudoVolume;
+    /**
+     * Console editions desired.
+     */
     private boolean verbose;
-
+    /**
+     * Number of gradients, which behave strictly monotonic for each direction.
+     * monotonicMatrix[xPos][xNeg][yPos][yNeg]
+     */
     private int[] monotonicMatrix = {0,0,0,0};
 
     /**
@@ -38,6 +104,7 @@ public class Object {
      * @param position  Coord3d - centre reference for the on´bject matrix
      * @param objectMatrixSize  Sets the size of X/2-Y/2
      * @param type  A or B object
+     * @param verbose   console editions desired
      * @throws IOException
      */
     public Object(Coord3d position, int objectMatrixSize, char type, boolean verbose) throws IOException {
@@ -45,7 +112,7 @@ public class Object {
         this.type = type;
         this.position = position;
         this.size = objectMatrixSize;
-        this.inHeightRange = 0;
+        this.pseudoVolume = 0;
         buildMatrix();
         fillGradients();
         strictlyMonotonic();
@@ -86,14 +153,14 @@ public class Object {
      */
     private void fillGradients() {
         List<Double> dummy = new LinkedList<>();
-        Point startPointX = new Point((matrixList.size()/2), 0); // Start at P(mid X | 0) in the given matrix.
+        Point startPointX = new Point((matrixList.size()/2), 0); // Start at P(mid X | min Y) in the given matrix.
 
-        for (int i = 0; i < matrixList.get(0).size() - 1; i++) {    // Iterate from P(mid X | 0) to P(mid X | max Y) in the given matrix.
+        for (int i = 0; i < matrixList.get(0).size() - 1; i++) {    // Iterate from P(mid X | min Y) to P(mid X | max Y) in the given matrix.
             dummy.add(getGradient(matrixList, startPointX, 'y'));   // Calculate the gradient and add him.
             startPointX.moveOneY();
         }
-        gradientsInXneg.addAll(dummy.subList(0, (int)getMax(matrixList).y ));       // Get the sublist P(mid X | 0) to P(mid X | mid Y)
-        Collections.reverse(gradientsInXneg);                                         // Reverse the list, to P(mid X | mid Y) to P(mid X | 0)
+        gradientsInXneg.addAll(dummy.subList(0, (int)getMax(matrixList).y ));       // Get the sublist P(mid X | min Y) to P(mid X | mid Y)
+        Collections.reverse(gradientsInXneg);                                         // Reverse the list, to P(mid X | mid Y) to P(mid X | min Y)
         gradientsInXneg = gradientsInXneg.stream().map(x -> x * -1 ).collect(Collectors.toList());  // Change the sign.
         gradientsInXpos.addAll(dummy.subList((int)getMax(matrixList).y , dummy.size()));    // Get the sublist P(mid X | mid Y) to P(mid X | max Y)
         if (verbose) System.out.println("Gradienten in X ->: \t\t" + gradientsInXpos);
@@ -106,8 +173,8 @@ public class Object {
             dummy.add(getGradient(matrixList, startPointY, 'x'));   // Calculate the gradient and add him.
             startPointY.moveOneX();
         }
-        gradientsInYpos.addAll(dummy.subList(0, (int)getMax(matrixList).x ));   // Get the sublist P(0 | mid Y) to P(mid X | mid Y)
-        Collections.reverse(gradientsInYpos);                                     // Reverse the list, to P(mid X | mid Y) to P(0 | mid Y)
+        gradientsInYpos.addAll(dummy.subList(0, (int)getMax(matrixList).x ));   // Get the sublist P(min X | mid Y) to P(mid X | mid Y)
+        Collections.reverse(gradientsInYpos);                                     // Reverse the list, to P(mid X | mid Y) to P(min X | mid Y)
         gradientsInYpos = gradientsInYpos.stream().map(x -> x * -1 ).collect(Collectors.toList());  // Change the sign.
         gradientsInYneg.addAll(dummy.subList((int)getMax(matrixList).x , dummy.size()));    // Get the sublist P(mid X | mid Y) to P(max X | mid Y)
         if (verbose) System.out.println("Gradienten in Y -> (down): \t" + gradientsInYneg);
@@ -427,9 +494,8 @@ public class Object {
                 }
             }
         }
-        inHeightRange = counter / (double)amountPoints;
-        positiveVolume = inHeightRange > 0.5;
-//        System.out.println("Pseudo Volume: [" + inHeightRange + "] by[" + zMinHigh + "]");
+        pseudoVolume = counter / (double)amountPoints;
+//        System.out.println("Pseudo Volume: [" + pseudoVolume + "] by[" + zMinHigh + "]");
     }
 
     /**
@@ -438,10 +504,6 @@ public class Object {
      */
     public boolean calcRight() {
         return calculatedType == type;
-    }
-
-    public boolean isPositiveVolume() {
-        return positiveVolume;
     }
 
     /**
@@ -472,7 +534,7 @@ public class Object {
         return symmetricStrong;
     }
 
-    public double getInHeightRange() {
-        return inHeightRange;
+    public double getPseudoVolume() {
+        return pseudoVolume;
     }
 }

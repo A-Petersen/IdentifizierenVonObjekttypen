@@ -353,7 +353,6 @@ public class Gatherer {
         for (CSVRecord row : rows) {                                   // Iterates through the CSV-File row by row (does not read the whole file into memory)
             List<Integer> dataListInner = new LinkedList<>();
             for (int i = yStart -1; i < yStop; i++) {                  // Iterates through Y (row) checks if the Y coordinate has to be considered.
-                //TODO: ??? war ohne -1, 41 | 40  (41|41 hat das ergebnis leicht verschlechtert, warum?)
                 if (count >= xStart) dataListInner.add(Integer.parseInt(row.get(i).replace(".", "")));
             }
             if (count >= xStart) dataList.add(dataListInner);          // Checks if X has to be considered, if then add the list.

@@ -125,8 +125,7 @@ public class Object {
         if (verbose) System.out.println("Gradient differences Max: [" + minMax[0] + "] \t Min: [" + minMax[1] + "]\nFlat: [" + flat + "]");
         if (verbose) System.out.println("Canyon: [" + canyon + "]");
         if (verbose) System.out.println("Flat in %: [" + flat + "]");
-        if (verbose) System.out.println("Weak Symetric: [" + symmetricWeak + "]" + "\nStrong Symetric: [" + symmetricStrong + "]");
-        if (verbose) System.out.println("Correct Type: [" + calcRight() + "]" +
+        if (verbose) System.out.println("Weak Symetric: [" + symmetricWeak + "]" + "\nStrong Symetric: [" + symmetricStrong + "]" +
                 "\n------------------------------------------------------------------------------------------\n");
     }
 

@@ -188,19 +188,20 @@ public class Gatherer {
     /**
      * Calculates the estimated types of the A and B objects of the Gatherer and prints the result.
      * Needs the class AttributeValues to calculate each object.
-     * @param attributeValues   AttributeValues for calculations
+     * @param aV   AttributeValues for calculations
      */
-    public void calculateObjects(AttributeValues attributeValues) {
-        objectsA.stream().forEach(x -> x.calculateType(attributeValues));
-        objectsB.stream().forEach(x -> x.calculateType(attributeValues));
-        if (verbose) System.out.println(
+    public void calculateObjects(AttributeValues aV) {
+        objectsA.stream().forEach(x -> x.calculateType(aV));
+        objectsB.stream().forEach(x -> x.calculateType(aV));
+        aV.printAttrValues();
+        System.out.println(
                 "\nA_right: "
                         + objectsA.stream().filter(x -> x.calcRight()).count()
-                        + " \tA_false: "
+                        + " \nA_false: "
                         + objectsA.stream().filter(x -> !x.calcRight()).count() + " FP[" + (objectsA.stream().filter(x -> !x.calcRight()).count() / (double)objectsA.size()) + "]"
                         + " \nB_right: "
                         + objectsB.stream().filter(x -> x.calcRight()).count() + " TP[" + (objectsB.stream().filter(x -> x.calcRight()).count() / (double)objectsB.size()) + "]"
-                        + " \tB_false: "
+                        + " \nB_false: "
                         + objectsB.stream().filter(x -> !x.calcRight()).count()
         );
     }

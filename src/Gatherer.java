@@ -100,13 +100,13 @@ public class Gatherer {
         double PCanyonA = canyonA / objectsA.size();
         double PSymAw = symAw / objectsA.size();
         double PSymAs = symAs / objectsA.size();
-        double PVolA =  objectsA.stream().filter(x -> x.getInHightRange() > 0.55).count() / (double)objectsA.size();
+        double PVolA =  objectsA.stream().filter(x -> x.getInHeightRange() > 0.55).count() / (double)objectsA.size();
 
         double PFlatB = numFlatB / objectsB.size();
         double PCanyonB = canyonB / objectsB.size();
         double PSymBw = symBw / objectsB.size();
         double PSymBs = symBs / objectsB.size();
-        double PVolB =  objectsB.stream().filter(x -> x.getInHightRange() > 0.55).count() / (double)objectsB.size();
+        double PVolB =  objectsB.stream().filter(x -> x.getInHeightRange() > 0.55).count() / (double)objectsB.size();
 
         attributeValues = new AttributeValues(
                 objectsA.size(), objectsB.size(), PA, PB,

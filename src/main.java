@@ -42,7 +42,7 @@ public class main {
         } else {
 
             //-----------------------------------------------------------------------------------------
-            // Task "IntelligenteSysteme":
+            // Task "IntelligenteSysteme - Identifizieren von Objekttypen":
             // Gatherer for data.csv with A0 + B0
             Gatherer dataMaxA0B0 = new Gatherer(true, a0, b0, data,
                     40,

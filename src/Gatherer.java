@@ -23,40 +23,68 @@ public class Gatherer {
     private int dataXsize = 0;
     private int dataYsize = 0;
 
+    private boolean verbose;
+
     private AttributeValues attributeValues;
 
     /**
-     * Constructor to create and analyse the given objects.
+     * Constructor to create and analyse the given objects over specified data.
      * @param createObjects True - create objects, False - do not create objects
+     * @param aCoordsData   Datapath to the CSV-File containing coordinates of A objects
+     * @param bCoordsData   Datapath to the CSV-File containing coordinates of B objects
+     * @param dataPath  Datapath to the main CSV-File
+     * @param xStart    Startpoint in X
+     * @param xStop     Endpoint of X
+     * @param yStart    Startpoint in Y
+     * @param yStop     Endpoint of Y
+     * @param objectMatrixSize  Matrix size of the created objects
+     * @param verbose   console editions desired
      * @throws IOException
      */
-    Gatherer(boolean createObjects, String aCoordsData, String bCoordsData, String dataPath, int xStart, int xStop, int yStart, int yStop, int objectMatrixSize) throws IOException {
+    Gatherer(boolean createObjects, String aCoordsData, String bCoordsData, String dataPath, int xStart, int xStop, int yStart, int yStop, int objectMatrixSize, boolean verbose) throws IOException {
+        this.verbose = verbose;
         xyValueA = getXYValues(aCoordsData);
         xyValueB = getXYValues(bCoordsData);
         getZValues(dataPath);
         getDataSize(dataPath);
-        System.out.println("DataSize[" + dataXsize + " x " + dataYsize + "]");
+        if (verbose) if (verbose) System.out.println("DataSize[" + dataXsize + " x " + dataYsize + "]");
         this.objectMatrixSize = objectMatrixSize / 2;
         coordsA = getCoords('A', xStop,yStop,xStart,yStart, createObjects);
         coordsB = getCoords('B', xStop,yStop,xStart,yStart, createObjects);
     }
 
-    Gatherer(boolean createObjects, String aCoordsData, String bCoordsData, String dataPath, int objectMatrixSize) throws IOException {
+    /**
+     * Constructor to create and analyse the given objects overall data.
+     * @param createObjects True - create objects, False - do not create objects
+     * @param aCoordsData   Datapath to the CSV-File containing coordinates of A objects
+     * @param bCoordsData   Datapath to the CSV-File containing coordinates of B objects
+     * @param dataPath  Datapath to the main CSV-File
+     * @param objectMatrixSize  Matrix size of the created objects
+     * @param verbose   console editions desired
+     * @throws IOException
+     */
+    Gatherer(boolean createObjects, String aCoordsData, String bCoordsData, String dataPath, int objectMatrixSize, boolean verbose) throws IOException {
+        this.verbose = verbose;
         xyValueA = getXYValues(aCoordsData);
         xyValueB = getXYValues(bCoordsData);
         getZValues(dataPath);
         getDataSize(dataPath);
-        System.out.println("DataSize[" + dataXsize + " x " + dataYsize + "]");
+        if (verbose) if (verbose) System.out.println("DataSize[" + dataXsize + " x " + dataYsize + "]");
         this.objectMatrixSize = objectMatrixSize / 2;
         coordsA = getCoords('A', dataXsize,dataYsize,1,1, createObjects);
         coordsB = getCoords('B', dataXsize,dataYsize,1,1, createObjects);
     }
 
     /**
-     * Constructor to build a View without creating and analysing the objects.
+     * Constructor to build a Gatherer for a View without creating and analysing the objects.
+     * @param aCoordsData   Datapath to the CSV-File containing coordinates of A objects
+     * @param bCoordsData   Datapath to the CSV-File containing coordinates of B objects
+     * @param dataPath  Datapath to the main CSV-File
+     * @param verbose   console editions desired
      * @throws IOException
      */
-    Gatherer(String aCoordsData, String bCoordsData, String dataPath) throws IOException {
+    Gatherer(String aCoordsData, String bCoordsData, String dataPath, boolean verbose) throws IOException {
+        this.verbose = verbose;
         xyValueA = getXYValues(aCoordsData);
         xyValueB = getXYValues(bCoordsData);
         getZValues(dataPath);
@@ -123,7 +151,7 @@ public class Gatherer {
     public void calculateObjects(AttributeValues attributeValues) {
         objectsA.stream().forEach(x -> x.calculateType(attributeValues));
         objectsB.stream().forEach(x -> x.calculateType(attributeValues));
-        System.out.println(
+        if (verbose) System.out.println(
                 "\nA_right: "
                         + objectsA.stream().filter(x -> x.calcRight()).count()
                         + " \tA_false: "
@@ -228,13 +256,13 @@ public class Gatherer {
                         Coord3d coord = new Coord3d(entry.getKey() - xStart, y - yStart, object.get(count));
                         list.add(coord);
 
-                        System.out.println("\n------------------------------------------------------------------------------------------\n"
+                        if (verbose) System.out.println("\n------------------------------------------------------------------------------------------\n"
                                 + type + ": " + entry.getKey() + "-" + y + "-" + object.get(count) + " Index[" + (list.size() - 1) + "]");
 
                         if (type == 'A' && createObjects) { // Create the object lists.
-                            objectsA.add(new Object(coord, objectMatrixSize, 'A'));
+                            objectsA.add(new Object(coord, objectMatrixSize, 'A', true));
                         } else if (createObjects) {
-                            objectsB.add(new Object(coord, objectMatrixSize, 'B'));
+                            objectsB.add(new Object(coord, objectMatrixSize, 'B', true));
                         }
                     }
                     count++;
@@ -253,7 +281,7 @@ public class Gatherer {
      */
     public AttributeValues getAttributeValues() {
         if (attributeValues == null) {
-            System.out.println("\n !!! No objects in AttributeValues created !!!");
+            if (verbose) System.out.println("\n !!! No objects in AttributeValues created !!!");
         }
         return attributeValues;
     }
@@ -307,10 +335,18 @@ public class Gatherer {
         return res;
     }
 
+    /**
+     * Number of Rows in the given data.
+     * @return Number of Rows in the given data
+     */
     public int getDataXsize() {
         return dataXsize;
     }
 
+    /**
+     * Number of Columns in the given data.
+     * @return Number of Columns in the given data
+     */
     public int getDataYsize() {
         return dataYsize;
     }

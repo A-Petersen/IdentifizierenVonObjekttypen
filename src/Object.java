@@ -28,6 +28,7 @@ public class Object {
     private double height;
     private double inHeightRange;
     private boolean positiveVolume = false;
+    private boolean verbose;
 
     private int[] monotonicMatrix = {0,0,0,0};
 
@@ -39,7 +40,8 @@ public class Object {
      * @param type  A or B object
      * @throws IOException
      */
-    public Object(Coord3d position, int objectMatrixSize, char type) throws IOException {
+    public Object(Coord3d position, int objectMatrixSize, char type, boolean verbose) throws IOException {
+        this.verbose = verbose;
         this.type = type;
         this.position = position;
         this.size = objectMatrixSize;
@@ -53,11 +55,11 @@ public class Object {
         this.minMax = maxGradientChange(6.0);
         volume();
         this.height = getMax(matrixList).z - getMin(matrixList).z;
-        System.out.println("Gradient differences Max: [" + minMax[0] + "] \t Min: [" + minMax[1] + "]\nFlat: [" + flat + "]");
-        System.out.println("Canyon: [" + canyon + "]");
-        System.out.println("Flat in %: [" + flat + "]");
-        System.out.println("Weak Symetric: [" + symmetricWeak + "]" + "\nStrong Symetric: [" + symmetricStrong + "]");
-        System.out.println("Correct Type: [" + calcRight() + "]" +
+        if (verbose) System.out.println("Gradient differences Max: [" + minMax[0] + "] \t Min: [" + minMax[1] + "]\nFlat: [" + flat + "]");
+        if (verbose) System.out.println("Canyon: [" + canyon + "]");
+        if (verbose) System.out.println("Flat in %: [" + flat + "]");
+        if (verbose) System.out.println("Weak Symetric: [" + symmetricWeak + "]" + "\nStrong Symetric: [" + symmetricStrong + "]");
+        if (verbose) System.out.println("Correct Type: [" + calcRight() + "]" +
                 "\n------------------------------------------------------------------------------------------\n");
     }
 
@@ -74,7 +76,7 @@ public class Object {
         position.x = position.x - (matrixList.size()/2) + maxZ.x;
         position.y = position.y - (matrixList.get(0).size()/2) + maxZ.y;
         position.z = maxZ.z;
-        System.out.println("New Max Coord_pos: [" + position + "]");
+        if (verbose) System.out.println("New Max Coord_pos: [" + position + "]");
         matrixList = Gatherer.getMatrix((int)position.x - size, (int)position.x + size, (int)position.y - size, (int)position.y + size, "Data/data.csv");
     }
 
@@ -94,8 +96,8 @@ public class Object {
         Collections.reverse(gradientsInXneg);                                         // Reverse the list, to P(mid X | mid Y) to P(mid X | 0)
         gradientsInXneg = gradientsInXneg.stream().map(x -> x * -1 ).collect(Collectors.toList());  // Change the sign.
         gradientsInXpos.addAll(dummy.subList((int)getMax(matrixList).y , dummy.size()));    // Get the sublist P(mid X | mid Y) to P(mid X | max Y)
-        System.out.println("Gradienten in X ->: \t\t" + gradientsInXpos);
-        System.out.println("Gradienten in <- X: \t\t" + gradientsInXneg);
+        if (verbose) System.out.println("Gradienten in X ->: \t\t" + gradientsInXpos);
+        if (verbose) System.out.println("Gradienten in <- X: \t\t" + gradientsInXneg);
 
 
         dummy.clear();
@@ -108,8 +110,8 @@ public class Object {
         Collections.reverse(gradientsInYpos);                                     // Reverse the list, to P(mid X | mid Y) to P(0 | mid Y)
         gradientsInYpos = gradientsInYpos.stream().map(x -> x * -1 ).collect(Collectors.toList());  // Change the sign.
         gradientsInYneg.addAll(dummy.subList((int)getMax(matrixList).x , dummy.size()));    // Get the sublist P(mid X | mid Y) to P(max X | mid Y)
-        System.out.println("Gradienten in Y -> (down): \t" + gradientsInYneg);
-        System.out.println("Gradienten in <- Y (up): \t" + gradientsInYpos);
+        if (verbose) System.out.println("Gradienten in Y -> (down): \t" + gradientsInYneg);
+        if (verbose) System.out.println("Gradienten in <- Y (up): \t" + gradientsInYpos);
 
     }
 
@@ -156,7 +158,7 @@ public class Object {
             monotonicMatrix[3]++;
         }
 
-        System.out.println("Monoton direction until failure: [x -> " + monotonicMatrix[0] + " | <- x " + monotonicMatrix[1] + " | <- y (up) " + monotonicMatrix[2] + " | y -> (down) " + monotonicMatrix[3] + "]");
+        if (verbose) System.out.println("Monoton direction until failure: [x -> " + monotonicMatrix[0] + " | <- x " + monotonicMatrix[1] + " | <- y (up) " + monotonicMatrix[2] + " | y -> (down) " + monotonicMatrix[3] + "]");
     }
 
     /**
@@ -266,7 +268,7 @@ public class Object {
             symmetricInX.add(gradientsInXneg.get(i) / gradientsInXpos.get(i));
         }
         int amountOfSymmetrics = (int) symmetricInX.stream().filter(x -> 1.0 - whatsSymmetric < x && x < 1.0 + whatsSymmetric).count();
-        System.out.println("Amount of Symetric Gradients in X: [" + amountOfSymmetrics + "]");
+        if (verbose) System.out.println("Amount of Symetric Gradients in X: [" + amountOfSymmetrics + "]");
         boolean inX = amountOfSymmetrics > amountOfSymmetricsNeeded;    // Is X symmetric ?
 
         int sizeY = gradientsInYpos.size() > gradientsInYneg.size() ? gradientsInYneg.size() : gradientsInYpos.size();  // Get the shortest of both lists.
@@ -274,7 +276,7 @@ public class Object {
             symmetricInY.add(gradientsInYneg.get(i) / gradientsInYpos.get(i));
         }
         amountOfSymmetrics = (int) symmetricInY.stream().filter(x -> 1.0 - whatsSymmetric < x && x < 1.0 + whatsSymmetric).count();
-        System.out.println("Amount of Symetric Gradients in Y: [" + amountOfSymmetrics + "]");
+        if (verbose) System.out.println("Amount of Symetric Gradients in Y: [" + amountOfSymmetrics + "]");
         boolean inY = amountOfSymmetrics > amountOfSymmetricsNeeded;    // Is Y symmetric ?
 
         symmetricWeak = inX || inY;
@@ -430,7 +432,10 @@ public class Object {
 //        System.out.println("Pseudo Volume: [" + inHeightRange + "] by[" + zMinHigh + "]");
     }
 
-
+    /**
+     * Returns the correctness of the calculation of the Type.
+     * @return correctness of the calculation of the Type
+     */
     public boolean calcRight() {
         return calculatedType == type;
     }
@@ -439,10 +444,18 @@ public class Object {
         return positiveVolume;
     }
 
+    /**
+     * Minimum Z-Value of the matrix.
+     * @return min Z-Value as double
+     */
     public double getMin() {
         return minMax[1];
     }
 
+    /**
+     * Maximum Z-Value of the matrix.
+     * @return max Z-Value as double
+     */
     public double getMax() {
         return minMax[0];
     }

@@ -14,7 +14,7 @@ public class View {
     private Gatherer gatherer;
 
     View (int xStart, int xStop, int yStart, int yStop, String aCoordsData, String bCoordsData, String dataPath) throws IOException {
-        this.gatherer = new Gatherer(aCoordsData, bCoordsData, dataPath);
+        this.gatherer = new Gatherer(aCoordsData, bCoordsData, dataPath, true);
         this.landscape = true;
         this.xStop = Gatherer.secureOutOfBound(xStop,1, gatherer.getDataXsize());
         this.xStart = Gatherer.secureOutOfBound(xStart,1, gatherer.getDataXsize());
@@ -25,7 +25,7 @@ public class View {
 
     View (int index, int martixSize, char type, String aCoordsData, String bCoordsData, String dataPath) throws IOException {
         this.landscape = false;
-        this.gatherer = new Gatherer(aCoordsData, bCoordsData, dataPath);
+        this.gatherer = new Gatherer(aCoordsData, bCoordsData, dataPath, true);
         List<Coord3d> coords = gatherer.getCoords(type == 'A' ? 'A' : 'B', gatherer.getDataXsize(), gatherer.getDataYsize(), 1, 1, false);
         this.coord = coords.get(index);
         this.type = type;

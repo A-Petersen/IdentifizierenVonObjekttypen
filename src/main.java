@@ -4,6 +4,8 @@ public class main {
     public static void main(String[] args) throws Exception {
         String a0 = "Data/A0.csv";
         String b0 = "Data/B0.csv";
+        String a1 = "Data/A1.csv";
+        String b1 = "Data/B1.csv";
         String data = "Data/data.csv";
 
         AnalysisLauncher.open(new Test(new View(0, 20, 'A', a0, b0, data), true));
@@ -16,21 +18,29 @@ public class main {
                 0.2691358024691358, 0.5456790123456791, 0.15555555555555556, 0.019753086419753086, 0.0);
 
         // DataSize: [4943 x 3000]
+        Gatherer gathererSpecified = new Gatherer(true, a0, b0, data,
+                200, 700,
+                200, 700,
+                40,
+                true
+        );
+        gathererSpecified.createAttributes();
+        AttributeValues attrSpecified = gathererSpecified.getAttributeValues();
+        attrSpecified.printAttrValues();
+        gathererSpecified.calculateObjects(attrSpecified);
+
         Gatherer gatherer = new Gatherer(true, a0, b0, data,
-                1, 500,
-                1, 500,
-                40
+                40,
+                true
         );
 
-//        Gatherer gatherer = new Gatherer(true, a0, b0, data,
-//                40
-//        );
-
         gatherer.createAttributes();
-        gatherer.getAttributeValues().printAttrValues();
-        gatherer.calculateObjects(gatherer.getAttributeValues());
+        AttributeValues attr = gatherer.getAttributeValues();
+        attr.printAttrValues();
+        gatherer.calculateObjects(attr);
 
         maxByMax.printAttrValues();
         gatherer.calculateObjects(maxByMax);
+        gathererSpecified.calculateObjects(maxByMax);
     }
 }

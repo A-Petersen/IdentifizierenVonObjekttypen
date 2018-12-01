@@ -36,9 +36,9 @@ public class Test extends AbstractAnalysis {
         if (!view.isLandscape()) {
             coord = view.getCoord();
         } else {
-            Gatherer points = new Gatherer();
-            coordsA = points.getCoords('A', xStop, yStop, xStart, yStart, false);
-            coordsB = points.getCoords('B', xStop, yStop, xStart, yStart, false);
+            Gatherer gatherer = view.getGatherer();
+            coordsA = gatherer.getCoords('A', xStop, yStop, xStart, yStart, false);
+            coordsB = gatherer.getCoords('B', xStop, yStop, xStart, yStart, false);
         }
         this.grid = grid;
         System.out.println("T1: " + this.xStart + "-" + this.xStop + "-" + this.yStart + "-" + this.yStop);
@@ -82,8 +82,8 @@ public class Test extends AbstractAnalysis {
         }
 
         if (view.isLandscape()) {
-            coordsA.stream().forEach(x -> chart.addDrawable(new Point(new Coord3d(x.x, x.y, x.z + 10000.0), Color.RED, 10)));
-            coordsB.stream().forEach(x -> chart.addDrawable(new Point(new Coord3d(x.x, x.y, x.z + 10000.0), Color.GREEN, 10)));
+            coordsA.stream().forEach(x -> chart.addDrawable(new Point(new Coord3d(x.x - 1, x.y - 1, x.z + 10000.0), Color.RED, 10)));
+            coordsB.stream().forEach(x -> chart.addDrawable(new Point(new Coord3d(x.x - 1, x.y - 1, x.z + 10000.0), Color.GREEN, 10)));
         }
 
     }

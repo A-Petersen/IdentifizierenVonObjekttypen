@@ -18,7 +18,7 @@ public class AttributeValues {
     private double PSymBs;
     private double PVolB;
 
-    public AttributeValues(int As, int Bs, double PA, double PB,
+    AttributeValues(int As, int Bs, double PA, double PB,
                            double PFlatA, double PCanyonA, double PSymAw, double PSymAs, double PVolA,
                            double PFlatB, double PCanyonB, double PSymBw, double PSymBs, double PVolB) {
         this.As = As;
@@ -36,6 +36,7 @@ public class AttributeValues {
         this.PSymBs = PSymBs;
         this.PVolB = PVolB;
     }
+
 
     public void printAttrValues() {
         System.out.println("\n\nP(A) = " + PA + "\tP(B) = " + PB + "\t of " + (As + Bs) + " Objects [A=" + As + "] B[" + Bs + "]");

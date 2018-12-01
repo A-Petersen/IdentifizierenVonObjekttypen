@@ -11,26 +11,28 @@ public class View {
     private Coord3d coord;
     private char type;
     private boolean landscape;
-    private Gatherer points = new Gatherer();
+    private Gatherer gatherer;
 
-    View (int xStart, int xStop, int yStart, int yStop) throws IOException {
+    View (int xStart, int xStop, int yStart, int yStop, String aCoordsData, String bCoordsData, String dataPath) throws IOException {
+        this.gatherer = new Gatherer(aCoordsData, bCoordsData, dataPath);
         this.landscape = true;
-        this.xStop = Gatherer.secureOutOfBound(xStop,1, 4943);
-        this.xStart = Gatherer.secureOutOfBound(xStart,1, 4943);
-        this.yStop = Gatherer.secureOutOfBound(yStop,1, 3000);
-        this.yStart = Gatherer.secureOutOfBound(yStart,1, 3000);
+        this.xStop = Gatherer.secureOutOfBound(xStop,1, gatherer.getDataXsize());
+        this.xStart = Gatherer.secureOutOfBound(xStart,1, gatherer.getDataXsize());
+        this.yStop = Gatherer.secureOutOfBound(yStop,1, gatherer.getDataYsize());
+        this.yStart = Gatherer.secureOutOfBound(yStart,1, gatherer.getDataYsize());
         System.out.println(this.xStop + "-" + this.xStart + "-" + this.yStop + "-" + this.yStart);
     }
 
-    View (int index, int martixSize, char type) throws IOException {
+    View (int index, int martixSize, char type, String aCoordsData, String bCoordsData, String dataPath) throws IOException {
         this.landscape = false;
-        List<Coord3d> coords = points.getCoords(type == 'A' ? 'A' : 'B', Gatherer.numRows_static, Gatherer.numColumns_static, 1, 1, false);
+        this.gatherer = new Gatherer(aCoordsData, bCoordsData, dataPath);
+        List<Coord3d> coords = gatherer.getCoords(type == 'A' ? 'A' : 'B', gatherer.getDataXsize(), gatherer.getDataYsize(), 1, 1, false);
         this.coord = coords.get(index);
         this.type = type;
-        this.xStop = Gatherer.secureOutOfBound((int)coord.x + martixSize,1, 4943);
-        this.xStart = Gatherer.secureOutOfBound((int)coord.x - martixSize,1, 4943);
-        this.yStop = Gatherer.secureOutOfBound((int)coord.y + martixSize,1, 3000);
-        this.yStart = Gatherer.secureOutOfBound((int)coord.y - martixSize,1, 3000);
+        this.xStop = Gatherer.secureOutOfBound((int)coord.x + martixSize,1, gatherer.getDataXsize());
+        this.xStart = Gatherer.secureOutOfBound((int)coord.x - martixSize,1, gatherer.getDataXsize());
+        this.yStop = Gatherer.secureOutOfBound((int)coord.y + martixSize,1, gatherer.getDataYsize());
+        this.yStart = Gatherer.secureOutOfBound((int)coord.y - martixSize,1, gatherer.getDataYsize());
         System.out.println(xStop + "-" + xStart + "-" + yStart + "-" + yStop);
     }
 
@@ -60,5 +62,9 @@ public class View {
 
     public boolean isLandscape() {
         return landscape;
+    }
+
+    public Gatherer getGatherer() {
+        return gatherer;
     }
 }

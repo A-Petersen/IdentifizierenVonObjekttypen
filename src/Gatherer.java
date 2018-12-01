@@ -2,16 +2,12 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.jzy3d.maths.Coord3d;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.*;
 
 public class Gatherer {
-    public static void main(String[] args) throws Exception {
-
-    }
 
     private Map<Integer, List<Integer>> xyValueA = new LinkedHashMap<>();
     private Map<Integer, List<Integer>> xyValueB = new LinkedHashMap<>();
@@ -22,38 +18,49 @@ public class Gatherer {
     private List<Object> objectsA = new LinkedList<>();
     private List<Object> objectsB = new LinkedList<>();
 
-    private static int objectMatrixSize = 20;
-    public static int numRows_static = 500;        // 4943
-    public static int numColumns_static = 500;     // 3000
+    private int objectMatrixSize = 20;
 
     private int dataXsize = 0;
     private int dataYsize = 0;
 
-    public AttributeValues attributeValues;
+    private AttributeValues attributeValues;
 
     /**
      * Constructor to create and analyse the given objects.
      * @param createObjects True - create objects, False - do not create objects
      * @throws IOException
      */
-    Gatherer(boolean createObjects, String aCoordsData, String bCoordsData, String dataPath) throws IOException {
+    Gatherer(boolean createObjects, String aCoordsData, String bCoordsData, String dataPath, int xStart, int xStop, int yStart, int yStop, int objectMatrixSize) throws IOException {
         xyValueA = getXYValues(aCoordsData);
         xyValueB = getXYValues(bCoordsData);
         getZValues(dataPath);
         getDataSize(dataPath);
         System.out.println("DataSize[" + dataXsize + " x " + dataYsize + "]");
-        coordsA = getCoords('A', numRows_static,numColumns_static,1,1, createObjects);
-        coordsB = getCoords('B', numRows_static,numColumns_static,1,1, createObjects);
+        this.objectMatrixSize = objectMatrixSize / 2;
+        coordsA = getCoords('A', xStop,yStop,xStart,yStart, createObjects);
+        coordsB = getCoords('B', xStop,yStop,xStart,yStart, createObjects);
+    }
+
+    Gatherer(boolean createObjects, String aCoordsData, String bCoordsData, String dataPath, int objectMatrixSize) throws IOException {
+        xyValueA = getXYValues(aCoordsData);
+        xyValueB = getXYValues(bCoordsData);
+        getZValues(dataPath);
+        getDataSize(dataPath);
+        System.out.println("DataSize[" + dataXsize + " x " + dataYsize + "]");
+        this.objectMatrixSize = objectMatrixSize / 2;
+        coordsA = getCoords('A', dataXsize,dataYsize,1,1, createObjects);
+        coordsB = getCoords('B', dataXsize,dataYsize,1,1, createObjects);
     }
 
     /**
      * Constructor to build a View without creating and analysing the objects.
      * @throws IOException
      */
-    Gatherer() throws IOException {
-        xyValueA = getXYValues("Data/A0.csv");
-        xyValueB = getXYValues("Data/B0.csv");
-        getZValues("Data/data.csv");
+    Gatherer(String aCoordsData, String bCoordsData, String dataPath) throws IOException {
+        xyValueA = getXYValues(aCoordsData);
+        xyValueB = getXYValues(bCoordsData);
+        getZValues(dataPath);
+        getDataSize(dataPath);
     }
 
     /**
@@ -245,6 +252,9 @@ public class Gatherer {
      * @return Class - AttributeValues
      */
     public AttributeValues getAttributeValues() {
+        if (attributeValues == null) {
+            System.out.println("\n !!! No objects in AttributeValues created !!!");
+        }
         return attributeValues;
     }
 
@@ -295,5 +305,13 @@ public class Gatherer {
         int res = x < min ? min : x;
         res = res > max ? max : res;
         return res;
+    }
+
+    public int getDataXsize() {
+        return dataXsize;
+    }
+
+    public int getDataYsize() {
+        return dataYsize;
     }
 }

@@ -31,12 +31,22 @@ public class Object {
 
     private int[] monotonicMatrix = {0,0,0,0};
 
-    public Object(Coord3d position, int ab, char type) throws IOException {
+    /**
+     * Constructor for an object.
+     * Most methods from object will take action inside the constructor, to gather the needed data.
+     * @param position  Coord3d - centre reference for the on´bject matrix
+     * @param objectMatrixSize  Sets the size of X/2-Y/2
+     * @param type  A or B object
+     * @throws IOException
+     */
+    public Object(Coord3d position, int objectMatrixSize, char type) throws IOException {
         this.type = type;
         this.position = position;
-        this.size = ab;
+        this.size = objectMatrixSize;
         this.inHightRange = 0;
-        gatherGradients();
+        buildMatrix();
+        fillGradients();
+        strictlyMonotonic();
         flat();
         symetric();
         fastSharp();
@@ -48,7 +58,13 @@ public class Object {
                 "\n------------------------------------------------------------------------------------------\n");
     }
 
-    public void gatherGradients() throws IOException {
+    /**
+     * Builds the Matrix for the given object.
+     * In detail, builds the matrix two times. First around the given object point, then searches for the highest point
+     * inside this matrix (max 10 by 10 around the old centre point). Second builds a new matrix around the new centre point.
+     * @throws IOException
+     */
+    public void buildMatrix() throws IOException {
 
         matrixList = Gatherer.getMatrix((int)position.x - size, (int)position.x + size, (int)position.y - size, (int)position.y + size, "Data/data.csv");
         Coord3d maxZ = getMax(matrixList);
@@ -57,10 +73,11 @@ public class Object {
         position.z = maxZ.z;
         System.out.println("New Max Coord_pos: [" + position + "]");
         matrixList = Gatherer.getMatrix((int)position.x - size, (int)position.x + size, (int)position.y - size, (int)position.y + size, "Data/data.csv");
-        fillGradients();
-        strictlyMonotonic();
     }
 
+    /**
+     * Fills the 
+     */
     private void fillGradients() {
         List<Double> dummy = new LinkedList<>();
         Point startPointX = new Point((matrixList.size()/2), 0);

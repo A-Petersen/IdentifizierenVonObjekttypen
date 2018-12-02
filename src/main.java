@@ -13,7 +13,7 @@ public class main {
         String b1 = "Data/B1.csv";
         String data = "Data/data.csv";
 
-        boolean showExamples = true;
+        boolean showExamples = false;
 
         if (showExamples) {
 

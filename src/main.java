@@ -23,21 +23,18 @@ public class main {
         AnalysisLauncher.open(new DrawView(new View(400, 580, 200, 380, a0, b0, data), false));
 
 
-        // Example for a specific Gatherer
-        Gatherer gathererSpecific = new Gatherer(true, a0, b0, data,
-                1, 500,
-                1, 500,
-                40,
-                true);
-        gathererSpecific.createAttributes();
-        gathererSpecific.calculateObjects(gathererSpecific.getAttributeValues());
-
-
         // Gathered AttributeValues by [4943 x 3000] data.csv and A0 + B0
         AttributeValues dataMaxA0B0AttrHardCoded = new AttributeValues(979, 405, 0.7073699421965318, 0.29263005780346824,
                 0.09397344228804903, 0.2839632277834525, 0.4198161389172625, 0.056179775280898875, 0.0,
                 0.2691358024691358, 0.5456790123456791, 0.15555555555555556, 0.019753086419753086, 0.0);
 
+        // Example for a specific Gatherer
+        Gatherer gathererSpecific = new Gatherer(true, a1, b1, data,
+                1, 1000,
+                1, 1000,
+                40,
+                true);
+        gathererSpecific.calculateObjects(dataMaxA0B0AttrHardCoded);
 
         } else {
 
